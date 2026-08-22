@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VaultCraft - Savings Planner & Tracker</title>
+  <meta name="description" content="Create target savings plans, log contributions, track progress, and analyze financial goals directly on GitHub Pages.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand-header">
+          <div class="brand-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <h1 class="brand-title">VaultCraft</h1>
+            <span class="brand-badge">GH-Pages Ready</span>
+          </div>
+        </div>
+
+        <ul class="nav-list">
+          <li class="nav-item">
+            <button class="nav-btn active" data-tab="dashboard">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span>Dashboard</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-btn" data-tab="plans">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              <span>Savings Plans</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-btn" data-tab="ledger">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Savings Ledger</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-btn" data-tab="tools">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+              <span>Calculators</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="quick-action-btn" onclick="app.openDepositModal('', 'deposit')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Log Savings</span>
+        </button>
+
+        <button class="theme-toggle-btn" id="themeToggleBtn">
+          <span style="display:flex; align-items:center; gap:0.5rem;">
+            <span id="themeIcon">🌙</span>
+            <span id="themeText">Dark Mode</span>
+          </span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="app.openBackupModal()" title="Data Backup / Export">
+            💾 Backup
+          </button>
+          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="app.openGitHubPagesModal()" title="Deploy to GitHub Pages">
+            🚀 Deploy
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="mobile-nav">
+      <button class="mobile-nav-btn active" data-tab="dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Overview</span>
+      </button>
+      <button class="mobile-nav-btn" data-tab="plans">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        <span>Goals</span>
+      </button>
+      <button class="mobile-nav-btn" data-tab="ledger">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+        <span>Ledger</span>
+      </button>
+      <button class="mobile-nav-btn" data-tab="tools">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>
+        <span>Tools</span>
+      </button>
+    </nav>
+
+    <!-- Main Content Work Area -->
+    <main class="main-content">
+      
+      <!-- Top Summary Grid -->
+      <section class="summary-grid" id="summaryCardsContainer">
+        <!-- Dynamically rendered by UIComponents.renderSummaryCards -->
+      </section>
+
+      <!-- TAB 1: DASHBOARD OVERVIEW -->
+      <div id="tab-dashboard" class="tab-content">
+        <div class="header-bar">
+          <div>
+            <h2 class="page-title">Savings Dashboard</h2>
+            <p class="page-subtitle">Track your goal milestones and monthly deposit momentum.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" onclick="app.openAutoAllocModal()">⚡ Auto-Allocator</button>
+            <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ New Goal Plan</button>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Left Column: Visual Growth Trend -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                Savings Velocity Trend
+              </h3>
+              <span class="badge-tag">Last 6 Months</span>
+            </div>
+            <div id="savingsTrendChart" class="chart-box"></div>
+          </div>
+
+          <!-- Right Column: Goal Category Distribution -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                Goal Allocation
+              </h3>
+            </div>
+            <div id="categoryDonutChart"></div>
+          </div>
+        </div>
+
+        <!-- Featured Goals Preview -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Active Target Plans</h3>
+            <button class="btn btn-outline btn-sm" onclick="app.switchTab('plans')">View All Plans →</button>
+          </div>
+          <div class="plans-grid" id="dashboardPlansContainer"></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: SAVINGS PLANS -->
+      <div id="tab-plans" class="tab-content" style="display: none;">
+        <div class="header-bar">
+          <div>
+            <h2 class="page-title">Savings Plans</h2>
+            <p class="page-subtitle">Manage your target savings goals, milestone dates, and visual velocity.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ Create New Savings Plan</button>
+          </div>
+        </div>
+
+        <div class="plans-header">
+          <div class="filter-bar">
+            <button class="chip-btn active" data-cat="all" onclick="app.filterPlans('all')">All Categories</button>
+            <button class="chip-btn" data-cat="safety" onclick="app.filterPlans('safety')">Safety & Emergency</button>
+            <button class="chip-btn" data-cat="travel" onclick="app.filterPlans('travel')">Travel & Vacation</button>
+            <button class="chip-btn" data-cat="tech" onclick="app.filterPlans('tech')">Tech & Gadgets</button>
+            <button class="chip-btn" data-cat="real estate" onclick="app.filterPlans('real estate')">Real Estate</button>
+          </div>
+        </div>
+
+        <div class="plans-grid" id="allPlansGrid">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- TAB 3: SAVINGS LEDGER -->
+      <div id="tab-ledger" class="tab-content" style="display: none;">
+        <div class="header-bar">
+          <div>
+            <h2 class="page-title">Savings Ledger</h2>
+            <p class="page-subtitle">Audit complete history of all deposits, milestone top-ups, and withdrawals.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="window.store.exportCSV()">📥 Export CSV</button>
+            <button class="btn btn-primary" onclick="app.openDepositModal('', 'deposit')">+ Log Savings</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; gap:1rem; flex-wrap:wrap;">
+            <div style="display:flex; gap:0.5rem; flex:1; min-width:260px;">
+              <input type="text" id="ledgerSearch" class="form-input" placeholder="Search by plan name or note...">
+            </div>
+            <div>
+              <select id="ledgerPlanFilter" class="form-select" onchange="app.renderLedger()">
+                <option value="all">All Goals</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="ledger-table-container">
+            <table class="ledger-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Savings Goal</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Note</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerTableBody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: CALCULATORS & FINANCIAL TOOLS -->
+      <div id="tab-tools" class="tab-content" style="display: none;">
+        <div class="header-bar">
+          <div>
+            <h2 class="page-title">Financial Calculators</h2>
+            <p class="page-subtitle">Smart tools to calculate long-term interest gains and bulk allocations.</p>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Compound Interest Calculator -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                Compound Savings Calculator
+              </h3>
+            </div>
+
+            <form id="compoundForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Initial Principal ($)</label>
+                  <input type="number" id="compoundPrincipal" class="form-input" value="1000">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Monthly Deposit ($)</label>
+                  <input type="number" id="compoundMonthly" class="form-input" value="250">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Expected Annual Return (%)</label>
+                  <input type="number" id="compoundRate" class="form-input" step="0.1" value="7.0">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Investment Duration (Years)</label>
+                  <input type="number" id="compoundYears" class="form-input" value="10">
+                </div>
+              </div>
+            </form>
+
+            <div style="margin-top:1.5rem; padding:1.25rem; background:var(--bg-tertiary); border-radius:var(--radius-md); border:1px solid var(--border-color);">
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:1rem; text-align:center;">
+                <div>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">FUTURE BALANCE</span>
+                  <div id="compoundTotalVal" style="font-size:1.5rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-emerald);">$0</div>
+                </div>
+                <div>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL DEPOSITED</span>
+                  <div id="compoundTotalDeposited" style="font-size:1.2rem; font-weight:700; font-family:var(--font-mono);">$0</div>
+                </div>
+                <div>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">INTEREST EARNED</span>
+                  <div id="compoundTotalInterest" style="font-size:1.2rem; font-weight:700; font-family:var(--font-mono); color:var(--accent-cyan);">$0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bulk Auto-Allocator Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Smart Auto-Allocator
+              </h3>
+            </div>
+            <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1rem;">
+              Got a paycheck or bonus? The auto-allocator algorithm distributes your bulk savings across active goals based on target dates and remaining gaps.
+            </p>
+            <button class="btn btn-primary" style="width:100%;" onclick="app.openAutoAllocModal()">
+              ⚡ Launch Auto-Allocator
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL: CREATE / EDIT SAVINGS PLAN -->
+  <dialog id="planModal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="planModalTitle">Create New Savings Goal</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('planModal').close()">✕</button>
+    </div>
+    <form id="planForm">
+      <div class="modal-body">
+        <input type="hidden" id="planIdInput">
+        <div class="form-group">
+          <label class="form-label">Goal Title *</label>
+          <input type="text" id="planTitleInput" class="form-input" placeholder="e.g. New Car Downpayment, Hawaii Trip" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="planCategoryInput" class="form-select">
+              <option value="General">General Savings</option>
+              <option value="Safety">Safety & Emergency</option>
+              <option value="Travel">Travel & Vacation</option>
+              <option value="Tech">Tech & Gadgets</option>
+              <option value="Real Estate">Real Estate</option>
+              <option value="Investment">Investments</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Emoji Icon</label>
+            <input type="text" id="planIconInput" class="form-input" placeholder="🎯" value="🎯">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Target Goal ($) *</label>
+            <input type="number" id="planTargetInput" class="form-input" placeholder="5000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Initial Deposit ($)</label>
+            <input type="number" id="planInitialInput" class="form-input" placeholder="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Completion Date *</label>
+          <input type="date" id="planTargetDateInput" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Color Theme Accent</label>
+          <div class="color-picker-group">
+            <div class="color-swatch active" style="background:#10b981;" data-color="#10b981"></div>
+            <div class="color-swatch" style="background:#3b82f6;" data-color="#3b82f6"></div>
+            <div class="color-swatch" style="background:#8b5cf6;" data-color="#8b5cf6"></div>
+            <div class="color-swatch" style="background:#f59e0b;" data-color="#f59e0b"></div>
+            <div class="color-swatch" style="background:#f43f5e;" data-color="#f43f5e"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description / Purpose</label>
+          <textarea id="planDescriptionInput" class="form-textarea" rows="2" placeholder="Notes on why you are saving for this goal..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('planModal').close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Goal Plan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MODAL: LOG SAVINGS / WITHDRAWAL -->
+  <dialog id="txModal">
+    <div class="modal-header">
+      <h3 class="modal-title">Log Savings Contribution</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('txModal').close()">✕</button>
+    </div>
+    <form id="txForm">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Select Target Plan *</label>
+          <select id="txPlanSelect" class="form-select" required>
+            <!-- Options populated dynamically -->
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Transaction Type</label>
+            <select id="txTypeSelect" class="form-select">
+              <option value="deposit">+ Deposit / Contribution</option>
+              <option value="withdrawal">- Withdrawal / Adjustment</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Amount ($) *</label>
+            <input type="number" id="txAmountInput" class="form-input" placeholder="100" min="0.01" step="0.01" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Transaction Date</label>
+          <input type="date" id="txDateInput" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Note / Reference</label>
+          <input type="text" id="txNoteInput" class="form-input" placeholder="e.g. Bi-weekly paycheck, Freelance bonus">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('txModal').close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Log Savings Record</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MODAL: AUTO ALLOCATOR -->
+  <dialog id="allocModal">
+    <div class="modal-header">
+      <h3 class="modal-title">Bulk Savings Auto-Allocator</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('allocModal').close()">✕</button>
+    </div>
+    <form id="allocForm">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Total Amount to Allocate ($)</label>
+          <input type="number" id="allocAmountInput" class="form-input" value="500" oninput="app.calculateAutoAlloc()">
+        </div>
+
+        <label class="form-label">Proposed Distribution across Active Goals:</label>
+        <div id="allocResultsContainer" style="margin-top:0.5rem;">
+          <!-- Dynamically computed -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('allocModal').close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Apply & Deposit All</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MODAL: BACKUP & DATA MANAGEMENT -->
+  <dialog id="backupModal">
+    <div class="modal-header">
+      <h3 class="modal-title">Data Backup & Export</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('backupModal').close()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1.25rem;">
+        Your savings data is stored locally in your browser's LocalStorage. Backup your data to JSON to transfer between devices or restore later.
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        <button class="btn btn-primary" onclick="window.store.exportJSON()">
+          📥 Export Backup (JSON)
+        </button>
+
+        <div style="padding:1rem; border:1px dashed var(--border-color); border-radius:var(--radius-md); text-align:center;">
+          <label class="form-label" style="margin-bottom:0.5rem;">Restore from JSON Backup File</label>
+          <input type="file" id="importJsonInput" accept=".json" style="display:none;" onchange="app.importJSONFile(this)">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('importJsonInput').click()">
+            📂 Select Backup File...
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="document.getElementById('backupModal').close()">Close</button>
+    </div>
+  </dialog>
+
+  <!-- MODAL: GITHUB PAGES DEPLOYMENT GUIDE -->
+  <dialog id="ghPagesModal">
+    <div class="modal-header">
+      <h3 class="modal-title">🚀 How to Deploy on GitHub Pages</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('ghPagesModal').close()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1rem;">
+        VaultCraft is built as a zero-dependency static web application, making it 100% compatible with GitHub Pages out of the box!
+      </p>
+
+      <ol style="margin-left:1.25rem; font-size:0.875rem; display:flex; flex-direction:column; gap:0.75rem;">
+        <li>
+          <strong>Create a GitHub Repository:</strong>
+          <p>Create a new repository on GitHub (e.g., <code>vaultcraft-savings</code>).</p>
+        </li>
+        <li>
+          <strong>Push your code to GitHub:</strong>
+          <div class="code-block">
+git init
+git add .
+git commit -m "Initial VaultCraft release"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/vaultcraft-savings.git
+git push -u origin main
+          </div>
+        </li>
+        <li>
+          <strong>Enable GitHub Pages:</strong>
+          <p>Go to repository <strong>Settings → Pages → Build and deployment</strong>. Select <code>Source: Deploy from a branch</code>, choose <code>main</code> branch and <code>/ (root)</code> folder, then click <strong>Save</strong>.</p>
+        </li>
+        <li>
+          <strong>Your Savings App is Live!</strong>
+          <p>Your app will be instantly accessible at <code>https://YOUR_USERNAME.github.io/vaultcraft-savings/</code>.</p>
+        </li>
+      </ol>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" onclick="document.getElementById('ghPagesModal').close()">Got it!</button>
+    </div>
+  </dialog>
+
+  <!-- Toast Notifications Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/store.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
