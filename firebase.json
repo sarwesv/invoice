@@ -3,9 +3,10 @@
     "providers": {
       "googleSignIn": {
         "oAuthBrandDisplayName": "VaultCraft",
+        "supportEmail": "mogalt+sar@gmail.com",
         "authorizedRedirectUris": [
-          "https://sarwesv.github.io/invoice/",
-          "http://localhost:8085"
+          "https://sarwesv.github.io",
+          "http://localhost"
         ]
       }
     }
