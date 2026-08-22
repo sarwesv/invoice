@@ -1,0 +1,13 @@
+{
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "VaultCraft",
+        "authorizedRedirectUris": [
+          "https://sarwesv.github.io/invoice/",
+          "http://localhost:8085"
+        ]
+      }
+    }
+  }
+}
