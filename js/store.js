@@ -24,6 +24,9 @@ class Store {
         this.transactions = parsed.transactions || DEFAULT_TRANSACTIONS;
         this.currency = parsed.currency || '$';
         this.theme = parsed.theme || 'dark';
+
+        // Reconcile current amounts from transaction history to ensure 100% data accuracy
+        this.reconcilePlanBalances();
       } else {
         this.plans = DEFAULT_PLANS;
         this.transactions = DEFAULT_TRANSACTIONS;
@@ -36,8 +39,21 @@ class Store {
     }
   }
 
+  reconcilePlanBalances() {
+    this.plans.forEach(plan => {
+      plan.targetAmount = parseFloat(plan.targetAmount) || 0;
+      const planTxs = this.transactions.filter(t => t.planId === plan.id);
+      const total = planTxs.reduce((sum, t) => {
+        const amt = parseFloat(t.amount) || 0;
+        return t.type === 'deposit' ? sum + amt : sum - amt;
+      }, 0);
+      plan.currentAmount = Math.max(0, total);
+    });
+  }
+
   saveState() {
     try {
+      this.reconcilePlanBalances();
       const data = {
         plans: this.plans,
         transactions: this.transactions,
@@ -52,6 +68,7 @@ class Store {
 
   // --- Plans CRUD ---
   getPlans(filterCategory = 'all', statusFilter = 'active') {
+    this.reconcilePlanBalances();
     return this.plans.filter(p => {
       const matchesCat = filterCategory === 'all' || p.category.toLowerCase() === filterCategory.toLowerCase();
       const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
@@ -65,12 +82,14 @@ class Store {
 
   addPlan(planData) {
     const id = 'plan_' + Date.now();
+    const initialDeposit = parseFloat(planData.initialDeposit) || 0;
+
     const newPlan = {
       id,
-      title: planData.title,
+      title: planData.title.trim(),
       category: planData.category || 'General',
       targetAmount: parseFloat(planData.targetAmount) || 0,
-      currentAmount: parseFloat(planData.initialDeposit) || 0,
+      currentAmount: 0, // Starts at 0; initial deposit transaction will set it
       targetDate: planData.targetDate,
       startDate: new Date().toISOString().split('T')[0],
       icon: planData.icon || '🎯',
@@ -84,13 +103,13 @@ class Store {
     this.plans.unshift(newPlan);
 
     // Record initial deposit as a transaction if > 0
-    if (newPlan.currentAmount > 0) {
+    if (initialDeposit > 0) {
       this.addTransaction({
         planId: id,
-        amount: newPlan.currentAmount,
+        amount: initialDeposit,
         type: 'deposit',
         date: newPlan.startDate,
-        note: 'Initial deposit upon plan creation'
+        note: 'Initial deposit upon goal creation'
       }, false);
     }
 
@@ -103,9 +122,14 @@ class Store {
     if (index !== -1) {
       this.plans[index] = {
         ...this.plans[index],
-        ...updatedData,
+        title: updatedData.title ? updatedData.title.trim() : this.plans[index].title,
+        category: updatedData.category || this.plans[index].category,
         targetAmount: parseFloat(updatedData.targetAmount) || this.plans[index].targetAmount,
-        recurringGoal: parseFloat(updatedData.recurringGoal) || this.plans[index].recurringGoal
+        targetDate: updatedData.targetDate || this.plans[index].targetDate,
+        icon: updatedData.icon || this.plans[index].icon,
+        color: updatedData.color || this.plans[index].color,
+        gradient: this.getGradientForColor(updatedData.color || this.plans[index].color),
+        description: updatedData.description !== undefined ? updatedData.description : this.plans[index].description
       };
       this.saveState();
       return this.plans[index];
@@ -123,6 +147,8 @@ class Store {
   addTransaction(txData, autoSave = true) {
     const id = 'tx_' + Date.now();
     const amount = parseFloat(txData.amount) || 0;
+    if (amount <= 0) return null;
+
     const type = txData.type || 'deposit'; // 'deposit' or 'withdrawal'
 
     const newTx = {
@@ -131,20 +157,10 @@ class Store {
       amount: Math.abs(amount),
       type,
       date: txData.date || new Date().toISOString().split('T')[0],
-      note: txData.note || (type === 'deposit' ? 'Savings Deposit' : 'Withdrawal')
+      note: txData.note || (type === 'deposit' ? 'Deposit' : 'Withdrawal')
     };
 
     this.transactions.unshift(newTx);
-
-    // Update plan's current amount
-    const plan = this.getPlanById(txData.planId);
-    if (plan) {
-      if (type === 'deposit') {
-        plan.currentAmount += newTx.amount;
-      } else {
-        plan.currentAmount = Math.max(0, plan.currentAmount - newTx.amount);
-      }
-    }
 
     if (autoSave) this.saveState();
     return newTx;
@@ -153,15 +169,6 @@ class Store {
   deleteTransaction(id) {
     const txIndex = this.transactions.findIndex(t => t.id === id);
     if (txIndex !== -1) {
-      const tx = this.transactions[txIndex];
-      const plan = this.getPlanById(tx.planId);
-      if (plan) {
-        if (tx.type === 'deposit') {
-          plan.currentAmount = Math.max(0, plan.currentAmount - tx.amount);
-        } else {
-          plan.currentAmount += tx.amount;
-        }
-      }
       this.transactions.splice(txIndex, 1);
       this.saveState();
     }
@@ -169,6 +176,7 @@ class Store {
 
   // --- Analytics & Calculated Totals ---
   getTotalSavings() {
+    this.reconcilePlanBalances();
     return this.plans.reduce((sum, p) => sum + p.currentAmount, 0);
   }
 
@@ -183,7 +191,6 @@ class Store {
   }
 
   getMonthlyContributions(monthsCount = 6) {
-    // Generate last N months data
     const result = [];
     const now = new Date();
     
@@ -201,33 +208,19 @@ class Store {
     return result;
   }
 
-  // Calculate saving velocity and projected completion date
   getPlanAnalytics(plan) {
     const remaining = Math.max(0, plan.targetAmount - plan.currentAmount);
-    const percent = Math.min(100, (plan.currentAmount / plan.targetAmount) * 100);
+    const percent = plan.targetAmount > 0 ? Math.min(100, (plan.currentAmount / plan.targetAmount) * 100) : 0;
 
     const now = new Date();
     const target = new Date(plan.targetDate);
     const diffTime = target - now;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    // Calculate historical monthly velocity for this plan
-    const planTxs = this.transactions.filter(t => t.planId === plan.id && t.type === 'deposit');
-    let avgMonthlyDeposit = plan.recurringGoal || 100;
-    
-    if (planTxs.length > 1) {
-      const totalDeposited = planTxs.reduce((sum, t) => sum + t.amount, 0);
-      avgMonthlyDeposit = totalDeposited / Math.max(1, (planTxs.length / 2));
-    }
-
-    const monthsToGoal = avgMonthlyDeposit > 0 ? (remaining / avgMonthlyDeposit) : 999;
-    const projectedDate = new Date();
-    projectedDate.setMonth(projectedDate.getMonth() + Math.ceil(monthsToGoal));
-
     let status = 'on-track';
     if (percent >= 100) {
       status = 'completed';
-    } else if (diffDays <= 0 || projectedDate > target) {
+    } else if (diffDays <= 0) {
       status = 'behind';
     }
 
@@ -235,30 +228,26 @@ class Store {
       remaining,
       percent,
       diffDays: Math.max(0, diffDays),
-      avgMonthlyDeposit,
-      projectedDate: projectedDate.toISOString().split('T')[0],
       status
     };
   }
 
-  // Bulk Auto Allocation helper algorithm
   autoAllocateBulkAmount(bulkAmount) {
     const activePlans = this.plans.filter(p => p.status === 'active' && p.currentAmount < p.targetAmount);
-    if (activePlans.length === 0) return [];
+    if (activePlans.length === 0 || bulkAmount <= 0) return [];
 
-    // Score plans by urgency (closest target date) and remaining gap percentage
     let totalScore = 0;
     const scoredPlans = activePlans.map(plan => {
       const remaining = plan.targetAmount - plan.currentAmount;
       const daysLeft = Math.max(1, Math.ceil((new Date(plan.targetDate) - new Date()) / (1000 * 60 * 60 * 24)));
-      // Urgency score: higher if fewer days left & higher remaining gap
       const score = (remaining / daysLeft);
       totalScore += score;
       return { plan, remaining, score };
     });
 
     return scoredPlans.map(item => {
-      const allocated = Math.min(item.remaining, Math.round((item.score / totalScore) * bulkAmount));
+      const rawAlloc = (item.score / totalScore) * bulkAmount;
+      const allocated = Math.min(item.remaining, Math.round(rawAlloc));
       return {
         plan: item.plan,
         allocatedAmount: allocated
@@ -266,7 +255,6 @@ class Store {
     });
   }
 
-  // --- Helper Helpers ---
   getGradientForColor(color) {
     const gradients = {
       '#10b981': 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
@@ -278,7 +266,6 @@ class Store {
     return gradients[color] || `linear-gradient(135deg, ${color} 0%, #3b82f6 100%)`;
   }
 
-  // --- Export & Import Data ---
   exportJSON() {
     const data = {
       plans: this.plans,

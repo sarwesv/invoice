@@ -265,6 +265,8 @@ class App {
     document.getElementById('planCategoryInput').value = 'General';
     document.getElementById('planTargetInput').value = '';
     document.getElementById('planInitialInput').value = '';
+    const initGrp = document.getElementById('planInitialGroup');
+    if (initGrp) initGrp.style.display = 'block';
     document.getElementById('planTargetDateInput').value = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     document.getElementById('planIconInput').value = '🎯';
     document.getElementById('planDescriptionInput').value = '';
@@ -280,7 +282,8 @@ class App {
     document.getElementById('planTitleInput').value = plan.title;
     document.getElementById('planCategoryInput').value = plan.category;
     document.getElementById('planTargetInput').value = plan.targetAmount;
-    document.getElementById('planInitialInput').value = plan.currentAmount;
+    const initGrp = document.getElementById('planInitialGroup');
+    if (initGrp) initGrp.style.display = 'none';
     document.getElementById('planTargetDateInput').value = plan.targetDate;
     document.getElementById('planIconInput').value = plan.icon;
     document.getElementById('planDescriptionInput').value = plan.description || '';
