@@ -289,7 +289,7 @@ class App {
       note: `Quick deposit +$${amount}`
     });
 
-    this.showToast(`Awesome! Added $${amount} to ${plan.title}! 🎉`);
+    this.showToast(`Added $${amount} to ${plan.title}.`);
     this.render();
   }
 

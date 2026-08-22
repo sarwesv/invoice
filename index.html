@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VaultCraft - My Savings Piggy Bank 🐷</title>
-  <meta name="description" content="Simple, fun savings plan creator and tracker for kids and students.">
+  <title>VaultCraft - Savings Planner & Tracker</title>
+  <meta name="description" content="Simple savings goal planner and tracker.">
   <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐷</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 </head>
 <body>
 
@@ -16,37 +16,36 @@
       <div>
         <div class="brand-header">
           <div class="brand-icon">
-            <span style="font-size:1.5rem;">🐷</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
           <div>
             <h1 class="brand-title">VaultCraft</h1>
-            <span style="font-size:0.75rem; color:var(--accent-emerald); font-weight:700;">Piggy Savings 🪙</span>
           </div>
         </div>
 
         <ul class="nav-list">
           <li class="nav-item">
             <button class="nav-btn active" data-tab="dashboard">
-              <span style="font-size:1.1rem;">🏠</span>
-              <span>Home</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span>Overview</span>
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-btn" data-tab="plans">
-              <span style="font-size:1.1rem;">🎯</span>
-              <span>My Goals</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              <span>Savings Goals</span>
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-btn" data-tab="ledger">
-              <span style="font-size:1.1rem;">📜</span>
-              <span>Money History</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>History</span>
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-btn" data-tab="tools">
-              <span style="font-size:1.1rem;">🪄</span>
-              <span>Growth Magic</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>
+              <span>Calculator</span>
             </button>
           </li>
         </ul>
@@ -54,7 +53,8 @@
 
       <div class="sidebar-footer">
         <button class="quick-action-btn" onclick="app.openDepositModal('', 'deposit')">
-          <span>💵 Add Savings</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Add Deposit</span>
         </button>
 
         <button class="theme-toggle-btn" id="themeToggleBtn">
@@ -70,20 +70,16 @@
     <!-- Mobile Bottom Navigation Bar -->
     <nav class="mobile-nav">
       <button class="mobile-nav-btn active" data-tab="dashboard">
-        <span style="font-size:1.2rem;">🏠</span>
-        <span>Home</span>
+        <span>Overview</span>
       </button>
       <button class="mobile-nav-btn" data-tab="plans">
-        <span style="font-size:1.2rem;">🎯</span>
         <span>Goals</span>
       </button>
       <button class="mobile-nav-btn" data-tab="ledger">
-        <span style="font-size:1.2rem;">📜</span>
         <span>History</span>
       </button>
       <button class="mobile-nav-btn" data-tab="tools">
-        <span style="font-size:1.2rem;">🪄</span>
-        <span>Magic</span>
+        <span>Calculator</span>
       </button>
     </nav>
 
@@ -99,12 +95,12 @@
       <div id="tab-dashboard" class="tab-content">
         <div class="header-bar">
           <div>
-            <h2 class="page-title">My Piggy Bank 🐷</h2>
-            <p class="page-subtitle">Watch your savings grow every time you add money!</p>
+            <h2 class="page-title">Savings Dashboard</h2>
+            <p class="page-subtitle">Track your progress toward your savings goals.</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-secondary" onclick="app.openAutoAllocModal()">⚡ Split My Savings</button>
-            <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ New Goal 🎯</button>
+            <button class="btn btn-secondary" onclick="app.openAutoAllocModal()">Split Deposit</button>
+            <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ New Goal</button>
           </div>
         </div>
 
@@ -113,7 +109,7 @@
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">
-                📈 Savings Momentum
+                Savings Over Time
               </h3>
               <span class="badge-tag">Last 6 Months</span>
             </div>
@@ -124,7 +120,7 @@
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">
-                🎨 Where My Money Goes
+                Category Breakdown
               </h3>
             </div>
             <div id="categoryDonutChart"></div>
@@ -134,8 +130,8 @@
         <!-- Featured Goals Preview -->
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">My Current Savings Goals</h3>
-            <button class="btn btn-outline btn-sm" onclick="app.switchTab('plans')">See All My Goals →</button>
+            <h3 class="card-title">Current Goals</h3>
+            <button class="btn btn-outline btn-sm" onclick="app.switchTab('plans')">See All Goals →</button>
           </div>
           <div class="plans-grid" id="dashboardPlansContainer"></div>
         </div>
@@ -145,21 +141,21 @@
       <div id="tab-plans" class="tab-content" style="display: none;">
         <div class="header-bar">
           <div>
-            <h2 class="page-title">My Savings Goals 🎯</h2>
-            <p class="page-subtitle">Create goals for toys, games, trips, or big dreams!</p>
+            <h2 class="page-title">Savings Goals</h2>
+            <p class="page-subtitle">Manage your individual target goals and completion dates.</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ Create New Goal</button>
+            <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ Create Goal</button>
           </div>
         </div>
 
         <div class="plans-header">
           <div class="filter-bar">
             <button class="chip-btn active" data-cat="all" onclick="app.filterPlans('all')">All Goals</button>
-            <button class="chip-btn" data-cat="safety" onclick="app.filterPlans('safety')">Emergency Fund 🛡️</button>
-            <button class="chip-btn" data-cat="travel" onclick="app.filterPlans('travel')">Trips & Fun ✈️</button>
-            <button class="chip-btn" data-cat="tech" onclick="app.filterPlans('tech')">Toys & Gadgets 🎮</button>
-            <button class="chip-btn" data-cat="real estate" onclick="app.filterPlans('real estate')">Big Dreams 🏡</button>
+            <button class="chip-btn" data-cat="safety" onclick="app.filterPlans('safety')">Emergency</button>
+            <button class="chip-btn" data-cat="travel" onclick="app.filterPlans('travel')">Travel</button>
+            <button class="chip-btn" data-cat="tech" onclick="app.filterPlans('tech')">Technology</button>
+            <button class="chip-btn" data-cat="real estate" onclick="app.filterPlans('real estate')">Real Estate</button>
           </div>
         </div>
 
@@ -172,19 +168,19 @@
       <div id="tab-ledger" class="tab-content" style="display: none;">
         <div class="header-bar">
           <div>
-            <h2 class="page-title">Money History 📜</h2>
-            <p class="page-subtitle">Check every allowance, gift, or deposit you added!</p>
+            <h2 class="page-title">Transaction History</h2>
+            <p class="page-subtitle">A simple list of every deposit and withdrawal made.</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-outline" onclick="window.store.exportCSV()">📥 Save to File</button>
-            <button class="btn btn-primary" onclick="app.openDepositModal('', 'deposit')">+ Add Money 💵</button>
+            <button class="btn btn-outline" onclick="window.store.exportCSV()">Export CSV</button>
+            <button class="btn btn-primary" onclick="app.openDepositModal('', 'deposit')">+ Add Deposit</button>
           </div>
         </div>
 
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; gap:1rem; flex-wrap:wrap;">
             <div style="display:flex; gap:0.5rem; flex:1; min-width:260px;">
-              <input type="text" id="ledgerSearch" class="form-input" placeholder="Search by note (e.g. Allowance, Birthday)...">
+              <input type="text" id="ledgerSearch" class="form-input" placeholder="Search by note or goal name...">
             </div>
             <div>
               <select id="ledgerPlanFilter" class="form-select" onchange="app.renderLedger()">
@@ -217,8 +213,8 @@
       <div id="tab-tools" class="tab-content" style="display: none;">
         <div class="header-bar">
           <div>
-            <h2 class="page-title">Growth Magic 🪄</h2>
-            <p class="page-subtitle">See how fast your money grows when you save regularly!</p>
+            <h2 class="page-title">Savings Calculator</h2>
+            <p class="page-subtitle">Calculate how fast your savings can grow over time.</p>
           </div>
         </div>
 
@@ -227,28 +223,28 @@
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">
-                🔮 Money Growth Predictor
+                Savings Growth Predictor
               </h3>
             </div>
 
             <form id="compoundForm">
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Money You Have Now ($)</label>
+                  <label class="form-label">Starting Amount ($)</label>
                   <input type="number" id="compoundPrincipal" class="form-input" value="100">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Money You Add Each Month ($)</label>
-                  <input type="number" id="compoundMonthly" class="form-input" value="20">
+                  <label class="form-label">Monthly Savings ($)</label>
+                  <input type="number" id="compoundMonthly" class="form-input" value="50">
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Yearly Bank Growth (%)</label>
+                  <label class="form-label">Annual Growth Rate (%)</label>
                   <input type="number" id="compoundRate" class="form-input" step="0.1" value="5.0">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">How Many Years?</label>
+                  <label class="form-label">Time Period (Years)</label>
                   <input type="number" id="compoundYears" class="form-input" value="5">
                 </div>
               </div>
@@ -257,15 +253,15 @@
             <div style="margin-top:1.5rem; padding:1.25rem; background:var(--bg-tertiary); border-radius:var(--radius-md); border:1px solid var(--border-color);">
               <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:1rem; text-align:center;">
                 <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL FUTURE MONEY</span>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL FUTURE BALANCE</span>
                   <div id="compoundTotalVal" style="font-size:1.5rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-emerald);">$0</div>
                 </div>
                 <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">YOUR OWN SAVINGS</span>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL CONTRIBUTIONS</span>
                   <div id="compoundTotalDeposited" style="font-size:1.2rem; font-weight:700; font-family:var(--font-mono);">$0</div>
                 </div>
                 <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">FREE BONUS INTEREST</span>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">INTEREST GAINED</span>
                   <div id="compoundTotalInterest" style="font-size:1.2rem; font-weight:700; font-family:var(--font-mono); color:var(--accent-cyan);">$0</div>
                 </div>
               </div>
@@ -276,14 +272,14 @@
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">
-                ⚡ Allowance Helper
+                Split Deposit Helper
               </h3>
             </div>
             <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1rem;">
-              Got birthday money or allowance? Type in the total amount and let VaultCraft split it fairly across your goals!
+              Enter a single deposit amount to split it across all your active savings goals based on target dates and remaining balances.
             </p>
             <button class="btn btn-primary" style="width:100%;" onclick="app.openAutoAllocModal()">
-              ⚡ Split My Allowance
+              Split Deposit
             </button>
           </div>
         </div>
@@ -295,52 +291,52 @@
   <!-- MODAL: CREATE / EDIT SAVINGS PLAN -->
   <dialog id="planModal">
     <div class="modal-header">
-      <h3 class="modal-title" id="planModalTitle">Create New Savings Goal</h3>
+      <h3 class="modal-title" id="planModalTitle">Create Savings Goal</h3>
       <button class="modal-close-btn" onclick="document.getElementById('planModal').close()">✕</button>
     </div>
     <form id="planForm">
       <div class="modal-body">
         <input type="hidden" id="planIdInput">
         <div class="form-group">
-          <label class="form-label">What are you saving for? (e.g. New Bike, Video Game) 🎯 *</label>
-          <input type="text" id="planTitleInput" class="form-input" placeholder="e.g. Nintendo Switch, Bike, Summer Camp" required>
+          <label class="form-label">Goal Name *</label>
+          <input type="text" id="planTitleInput" class="form-input" placeholder="e.g. New Laptop, Bike, College Fund" required>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Category 🏷️</label>
+            <label class="form-label">Category</label>
             <select id="planCategoryInput" class="form-select">
-              <option value="Tech">Toys & Games 🎮</option>
-              <option value="Travel">Trips & Fun ✈️</option>
-              <option value="Safety">Emergency Fund 🛡️</option>
-              <option value="Real Estate">Big Dreams 🏡</option>
-              <option value="General">General Savings 🪙</option>
+              <option value="General">General</option>
+              <option value="Tech">Technology</option>
+              <option value="Travel">Travel</option>
+              <option value="Safety">Emergency</option>
+              <option value="Real Estate">Real Estate</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Choose an Emoji 😃</label>
-            <input type="text" id="planIconInput" class="form-input" placeholder="🚲" value="🚲">
+            <label class="form-label">Icon</label>
+            <input type="text" id="planIconInput" class="form-input" placeholder="🎯" value="🎯">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Goal Price ($) 💰 *</label>
+            <label class="form-label">Target Amount ($) *</label>
             <input type="number" id="planTargetInput" class="form-input" placeholder="100" min="1" required>
           </div>
           <div class="form-group">
-            <label class="form-label">Starting Money ($) 🪙</label>
+            <label class="form-label">Initial Amount ($)</label>
             <input type="number" id="planInitialInput" class="form-input" placeholder="0">
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">When do you want to buy it by? 📅 *</label>
+          <label class="form-label">Target Date *</label>
           <input type="date" id="planTargetDateInput" class="form-input" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Pick Your Favorite Color 🎨</label>
+          <label class="form-label">Color Accent</label>
           <div class="color-picker-group">
             <div class="color-swatch active" style="background:#10b981;" data-color="#10b981"></div>
             <div class="color-swatch" style="background:#3b82f6;" data-color="#3b82f6"></div>
@@ -351,13 +347,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Why is this goal important to you? 📝</label>
-          <textarea id="planDescriptionInput" class="form-textarea" rows="2" placeholder="e.g. I want a new red bike to ride with my friends after school!"></textarea>
+          <label class="form-label">Description / Note</label>
+          <textarea id="planDescriptionInput" class="form-textarea" rows="2" placeholder="Optional notes about this goal..."></textarea>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="document.getElementById('planModal').close()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Goal 🎯</button>
+        <button type="submit" class="btn btn-primary">Save Goal</button>
       </div>
     </form>
   </dialog>
@@ -365,13 +361,13 @@
   <!-- MODAL: LOG SAVINGS / WITHDRAWAL -->
   <dialog id="txModal">
     <div class="modal-header">
-      <h3 class="modal-title">Add Money to Goal</h3>
+      <h3 class="modal-title">Log Transaction</h3>
       <button class="modal-close-btn" onclick="document.getElementById('txModal').close()">✕</button>
     </div>
     <form id="txForm">
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Which goal is this for? 🎯 *</label>
+          <label class="form-label">Goal *</label>
           <select id="txPlanSelect" class="form-select" required>
             <!-- Options populated dynamically -->
           </select>
@@ -379,10 +375,10 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Action</label>
+            <label class="form-label">Type</label>
             <select id="txTypeSelect" class="form-select">
-              <option value="deposit">💵 Add Money (+)</option>
-              <option value="withdrawal">💸 Take Out Money (-)</option>
+              <option value="deposit">+ Deposit</option>
+              <option value="withdrawal">- Withdrawal</option>
             </select>
           </div>
           <div class="form-group">
@@ -393,7 +389,7 @@
 
         <!-- Quick Amount Preset Chips -->
         <div style="margin-bottom: 1rem;">
-          <label class="form-label">Quick Tap Amounts:</label>
+          <label class="form-label">Quick Amounts:</label>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
             <button type="button" class="chip-btn" onclick="document.getElementById('txAmountInput').value = 5">+$5</button>
             <button type="button" class="chip-btn" onclick="document.getElementById('txAmountInput').value = 10">+$10</button>
@@ -408,13 +404,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Where did you get this money? 💡</label>
-          <input type="text" id="txNoteInput" class="form-input" placeholder="e.g. Allowance, Birthday gift from Grandma, Chores">
+          <label class="form-label">Note</label>
+          <input type="text" id="txNoteInput" class="form-input" placeholder="e.g. Allowance, Gift, Weekly savings">
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="document.getElementById('txModal').close()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Money Record 💵</button>
+        <button type="submit" class="btn btn-primary">Save Transaction</button>
       </div>
     </form>
   </dialog>
@@ -422,24 +418,24 @@
   <!-- MODAL: AUTO ALLOCATOR -->
   <dialog id="allocModal">
     <div class="modal-header">
-      <h3 class="modal-title">Split Allowance Helper</h3>
+      <h3 class="modal-title">Split Deposit</h3>
       <button class="modal-close-btn" onclick="document.getElementById('allocModal').close()">✕</button>
     </div>
     <form id="allocForm">
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Total Money You Want to Split ($)</label>
+          <label class="form-label">Amount to Split ($)</label>
           <input type="number" id="allocAmountInput" class="form-input" value="50" oninput="app.calculateAutoAlloc()">
         </div>
 
-        <label class="form-label">Suggested split across your active goals:</label>
+        <label class="form-label">Proposed Distribution:</label>
         <div id="allocResultsContainer" style="margin-top:0.5rem;">
           <!-- Dynamically computed -->
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="document.getElementById('allocModal').close()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Add Money to All Goals 💵</button>
+        <button type="submit" class="btn btn-primary">Apply Split</button>
       </div>
     </form>
   </dialog>
