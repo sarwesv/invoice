@@ -4,6 +4,7 @@
 const STORAGE_KEY = 'vaultcraft_savings_data_v1';
 const REQUESTS_KEY = 'vaultcraft_money_requests_v1';
 const USER_PROFILE_KEY = 'vaultcraft_user_profile_v1';
+const PIN_REGISTRY_KEY = 'vaultcraft_pin_registry_v1';
 
 const DEFAULT_PLANS = [];
 const DEFAULT_TRANSACTIONS = [];
@@ -60,13 +61,52 @@ class Store {
     }
   }
 
-  setUserPin(pin) {
-    if (/^\d{4}$/.test(pin)) {
-      this.userPin = pin;
-      this.saveUserProfile();
-      return true;
+  getPinRegistry() {
+    try {
+      const raw = localStorage.getItem(PIN_REGISTRY_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
     }
-    return false;
+  }
+
+  savePinRegistry(registry) {
+    try {
+      localStorage.setItem(PIN_REGISTRY_KEY, JSON.stringify(registry));
+    } catch (e) {
+      console.error('Error saving PIN registry:', e);
+    }
+  }
+
+  isPinAvailable(pin) {
+    if (!/^\d{4}$/.test(pin)) return false;
+    const registry = this.getPinRegistry();
+    const existingOwner = registry[pin];
+    return !existingOwner || existingOwner === this.userCode;
+  }
+
+  setUserPin(pin) {
+    if (!/^\d{4}$/.test(pin)) {
+      return { success: false, message: 'PIN must be exactly 4 digits (numbers only).' };
+    }
+    
+    const registry = this.getPinRegistry();
+    if (registry[pin] && registry[pin] !== this.userCode) {
+      return { success: false, message: 'This PIN is already used by another user code. Every PIN must be unique! Please pick a different 4-digit PIN.' };
+    }
+
+    // Remove old PIN assignment for this user code if exists
+    if (this.userPin && registry[this.userPin] === this.userCode) {
+      delete registry[this.userPin];
+    }
+
+    // Register new PIN
+    registry[pin] = this.userCode;
+    this.savePinRegistry(registry);
+
+    this.userPin = pin;
+    this.saveUserProfile();
+    return { success: true };
   }
 
   verifyPin(pin) {
@@ -104,7 +144,7 @@ class Store {
       amount: parseFloat(amount) || 0,
       goalId,
       note: note.trim() || 'Money Request',
-      status: 'pending', // 'pending', 'approved', 'declined'
+      status: 'pending',
       createdAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 

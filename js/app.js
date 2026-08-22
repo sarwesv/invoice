@@ -466,11 +466,12 @@ class App {
   handleSetPinSubmit(e) {
     e.preventDefault();
     const pin = document.getElementById('newPinInput').value.trim();
-    if (window.store.setUserPin(pin)) {
+    const res = window.store.setUserPin(pin);
+    if (res.success) {
       document.getElementById('setPinModal').close();
-      this.showToast('4-digit Security PIN updated successfully!');
+      this.showToast('4-digit Unique Security PIN saved!');
     } else {
-      alert('Please enter a valid 4-digit PIN (numbers only).');
+      alert(res.message);
     }
   }
 
