@@ -13,6 +13,7 @@ class App {
     document.addEventListener('DOMContentLoaded', () => {
       this.bindEvents();
       this.applyTheme(window.store.theme);
+      this.updateUserCodeDisplay();
       if (typeof window.initFirebaseAuth === 'function') {
         window.initFirebaseAuth();
       }
@@ -20,10 +21,29 @@ class App {
     });
   }
 
+  updateUserCodeDisplay() {
+    const el = document.getElementById('userCodeVal');
+    if (el && window.store) {
+      el.textContent = window.store.userCode;
+    }
+  }
+
+  copyUserCode() {
+    if (!window.store) return;
+    const code = window.store.userCode;
+    navigator.clipboard.writeText(code).then(() => {
+      this.showToast(`Copied code: ${code}`);
+    }).catch(() => {
+      this.showToast(`User Code: ${code}`);
+    });
+  }
+
   onAuthStateChanged(user) {
     const loginScreen = document.getElementById('loginScreen');
     const appContainer = document.getElementById('appContainer');
     const authContainer = document.getElementById('authContainer');
+
+    this.updateUserCodeDisplay();
 
     if (user) {
       if (loginScreen) loginScreen.style.display = 'none';
@@ -92,6 +112,16 @@ class App {
       txForm.addEventListener('submit', (e) => this.handleTxFormSubmit(e));
     }
 
+    const requestMoneyForm = document.getElementById('requestMoneyForm');
+    if (requestMoneyForm) {
+      requestMoneyForm.addEventListener('submit', (e) => this.handleRequestMoneySubmit(e));
+    }
+
+    const setPinForm = document.getElementById('setPinForm');
+    if (setPinForm) {
+      setPinForm.addEventListener('submit', (e) => this.handleSetPinSubmit(e));
+    }
+
     const allocForm = document.getElementById('allocForm');
     if (allocForm) {
       allocForm.addEventListener('submit', (e) => this.handleAutoAllocSubmit(e));
@@ -154,10 +184,13 @@ class App {
 
   render() {
     this.renderSummary();
+    this.updateUserCodeDisplay();
     if (this.currentTab === 'dashboard') {
       this.renderDashboard();
     } else if (this.currentTab === 'plans') {
       this.renderPlans();
+    } else if (this.currentTab === 'requests') {
+      this.renderRequests();
     } else if (this.currentTab === 'ledger') {
       this.renderLedger();
     } else if (this.currentTab === 'tools') {
@@ -173,18 +206,16 @@ class App {
   }
 
   renderDashboard() {
-    // Render Plans preview grid
     const plansPreview = document.getElementById('dashboardPlansContainer');
     if (plansPreview) {
       const activePlans = window.store.getPlans('all', 'active').slice(0, 3);
       if (activePlans.length === 0) {
-        plansPreview.innerHTML = `<div class="empty-state"><p class="empty-title">No Active Plans</p><button class="btn btn-primary btn-sm" onclick="app.openNewPlanModal()">+ Create Plan</button></div>`;
+        plansPreview.innerHTML = `<div class="empty-state"><p class="empty-title">No Active Goals</p><button class="btn btn-primary btn-sm" onclick="app.openNewPlanModal()">+ Create Goal</button></div>`;
       } else {
         plansPreview.innerHTML = activePlans.map(p => UIComponents.renderPlanCard(p, window.store)).join('');
       }
     }
 
-    // Render Charts
     setTimeout(() => {
       const monthlyData = window.store.getMonthlyContributions(6);
       ChartsEngine.renderTrendChart('savingsTrendChart', monthlyData, window.store.currency);
@@ -201,13 +232,25 @@ class App {
       grid.innerHTML = `
         <div class="empty-state" style="grid-column: 1 / -1;">
           <div class="empty-icon">🎯</div>
-          <p class="empty-title">No Savings Plans Found</p>
-          <p style="font-size:0.85rem; margin-bottom:1rem;">Start setting up your target savings goals now.</p>
-          <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ Create New Goal Plan</button>
+          <p class="empty-title">No Savings Goals Found</p>
+          <p style="font-size:0.85rem; margin-bottom:1rem;">Start setting up your target goals now.</p>
+          <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ Create New Goal</button>
         </div>
       `;
     } else {
       grid.innerHTML = plans.map(p => UIComponents.renderPlanCard(p, window.store)).join('');
+    }
+  }
+
+  renderRequests() {
+    const incomingContainer = document.getElementById('incomingRequestsContainer');
+    const outgoingContainer = document.getElementById('outgoingRequestsContainer');
+
+    if (incomingContainer) {
+      incomingContainer.innerHTML = UIComponents.renderIncomingRequests(window.store.getIncomingRequests(), window.store);
+    }
+    if (outgoingContainer) {
+      outgoingContainer.innerHTML = UIComponents.renderOutgoingRequests(window.store.getOutgoingRequests(), window.store);
     }
   }
 
@@ -233,7 +276,6 @@ class App {
 
     tbody.innerHTML = UIComponents.renderLedgerRows(txs, window.store);
 
-    // Populate plan filter select dropdown if needed
     const planFilterSelect = document.getElementById('ledgerPlanFilter');
     if (planFilterSelect && planFilterSelect.options.length <= 1) {
       window.store.plans.forEach(p => {
@@ -247,13 +289,6 @@ class App {
 
   filterPlans(category) {
     this.categoryFilter = category;
-    document.querySelectorAll('.filter-bar .chip-btn').forEach(btn => {
-      if (btn.getAttribute('data-cat') === category) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
     this.renderPlans();
   }
 
@@ -380,8 +415,75 @@ class App {
     }
   }
 
+  // --- Money Requests Modals & Handlers ---
+  openRequestMoneyModal() {
+    if (!window.store.userPin) {
+      this.showToast('Please set your 4-digit PIN first.');
+      this.openSetPinModal();
+      return;
+    }
+
+    document.getElementById('reqRecipientCodeInput').value = '';
+    document.getElementById('reqAmountInput').value = '';
+    document.getElementById('reqNoteInput').value = '';
+    document.getElementById('reqPinInput').value = '';
+    document.getElementById('requestMoneyModal').showModal();
+  }
+
+  handleRequestMoneySubmit(e) {
+    e.preventDefault();
+    const recipientCode = document.getElementById('reqRecipientCodeInput').value.trim();
+    const amount = parseFloat(document.getElementById('reqAmountInput').value) || 0;
+    const note = document.getElementById('reqNoteInput').value;
+    const pin = document.getElementById('reqPinInput').value;
+
+    if (recipientCode.toLowerCase() === window.store.userCode.toLowerCase()) {
+      alert('You cannot send a money request to your own User Code!');
+      return;
+    }
+
+    if (!window.store.verifyPin(pin)) {
+      alert('Incorrect 4-digit Security PIN. Please try again.');
+      return;
+    }
+
+    if (amount <= 0) {
+      alert('Please enter a valid request amount.');
+      return;
+    }
+
+    window.store.createMoneyRequest(recipientCode, amount, '', note);
+    document.getElementById('requestMoneyModal').close();
+    this.showToast(`Request for $${amount} sent to code ${recipientCode}!`);
+    this.switchTab('requests');
+  }
+
+  openSetPinModal() {
+    document.getElementById('newPinInput').value = '';
+    document.getElementById('setPinModal').showModal();
+  }
+
+  handleSetPinSubmit(e) {
+    e.preventDefault();
+    const pin = document.getElementById('newPinInput').value.trim();
+    if (window.store.setUserPin(pin)) {
+      document.getElementById('setPinModal').close();
+      this.showToast('4-digit Security PIN updated successfully!');
+    } else {
+      alert('Please enter a valid 4-digit PIN (numbers only).');
+    }
+  }
+
+  updateMoneyRequestStatus(requestId, status) {
+    const req = window.store.updateRequestStatus(requestId, status);
+    if (req) {
+      this.showToast(`Request from ${req.senderName} ${status}.`);
+      this.renderRequests();
+    }
+  }
+
   openAutoAllocModal() {
-    document.getElementById('allocAmountInput').value = '500';
+    document.getElementById('allocAmountInput').value = '50';
     this.calculateAutoAlloc();
     document.getElementById('allocModal').showModal();
   }
@@ -392,7 +494,7 @@ class App {
     const container = document.getElementById('allocResultsContainer');
 
     if (allocations.length === 0) {
-      container.innerHTML = `<p style="font-size:0.85rem; color:var(--text-muted);">No active incomplete plans available for allocation.</p>`;
+      container.innerHTML = `<p style="font-size:0.85rem; color:var(--text-muted);">No active goals available for allocation.</p>`;
       return;
     }
 
@@ -421,21 +523,21 @@ class App {
           amount: item.allocatedAmount,
           type: 'deposit',
           date: new Date().toISOString().split('T')[0],
-          note: 'Smart Auto-Allocation deposit'
+          note: 'Auto-Allocation deposit'
         });
       }
     });
 
     document.getElementById('allocModal').close();
-    this.showToast('Bulk savings allocated across goals!');
+    this.showToast('Deposit split across goals!');
     this.render();
   }
 
   calculateCompoundInterest() {
-    const principal = parseFloat(document.getElementById('compoundPrincipal')?.value) || 1000;
-    const monthlyDep = parseFloat(document.getElementById('compoundMonthly')?.value) || 200;
-    const ratePct = parseFloat(document.getElementById('compoundRate')?.value) || 7;
-    const years = parseInt(document.getElementById('compoundYears')?.value) || 10;
+    const principal = parseFloat(document.getElementById('compoundPrincipal')?.value) || 100;
+    const monthlyDep = parseFloat(document.getElementById('compoundMonthly')?.value) || 50;
+    const ratePct = parseFloat(document.getElementById('compoundRate')?.value) || 5;
+    const years = parseInt(document.getElementById('compoundYears')?.value) || 5;
 
     const r = ratePct / 100 / 12;
     const n = years * 12;
@@ -456,32 +558,6 @@ class App {
     if (resVal) resVal.textContent = `${window.store.currency}${Math.round(balance).toLocaleString()}`;
     if (resDep) resDep.textContent = `${window.store.currency}${Math.round(totalDeposited).toLocaleString()}`;
     if (resInt) resInt.textContent = `${window.store.currency}${Math.round(interestEarned).toLocaleString()}`;
-  }
-
-  openGitHubPagesModal() {
-    document.getElementById('ghPagesModal').showModal();
-  }
-
-  openBackupModal() {
-    document.getElementById('backupModal').showModal();
-  }
-
-  importJSONFile(inputEl) {
-    const file = inputEl.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const success = window.store.importJSON(e.target.result);
-        if (success) {
-          this.showToast('Backup restored successfully!');
-          document.getElementById('backupModal').close();
-          this.render();
-        } else {
-          alert('Failed to import JSON file. Please ensure it is a valid VaultCraft backup file.');
-        }
-      };
-      reader.readAsText(file);
-    }
   }
 
   showToast(message) {

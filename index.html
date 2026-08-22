@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VaultCraft - Savings Planner & Tracker</title>
-  <meta name="description" content="Simple savings goal planner and tracker.">
+  <meta name="description" content="Simple savings goal planner and tracker with user code money requests.">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 </head>
@@ -27,7 +27,7 @@
           <span>💵 Log deposits & withdrawals easily</span>
         </div>
         <div class="login-feature-item">
-          <span>📊 Visualize your savings growth</span>
+          <span>📩 Send money requests via User Code (e.g. Fj38f)</span>
         </div>
       </div>
 
@@ -48,6 +48,9 @@
           </div>
           <div>
             <h1 class="brand-title">VaultCraft</h1>
+            <div id="userCodeBadge" style="font-size:0.75rem; color:var(--accent-emerald); font-weight:700; cursor:pointer;" onclick="app.copyUserCode()" title="Click to copy your unique user code">
+              My Code: <span id="userCodeVal">Fj38f</span> 📋
+            </div>
           </div>
         </div>
 
@@ -62,6 +65,12 @@
             <button class="nav-btn" data-tab="plans">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
               <span>Savings Goals</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-btn" data-tab="requests">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              <span>Money Requests</span>
             </button>
           </li>
           <li class="nav-item">
@@ -110,6 +119,9 @@
       <button class="mobile-nav-btn" data-tab="plans">
         <span>Goals</span>
       </button>
+      <button class="mobile-nav-btn" data-tab="requests">
+        <span>Requests</span>
+      </button>
       <button class="mobile-nav-btn" data-tab="ledger">
         <span>History</span>
       </button>
@@ -134,7 +146,7 @@
             <p class="page-subtitle">Track your progress toward your savings goals.</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-secondary" onclick="app.openAutoAllocModal()">Split Deposit</button>
+            <button class="btn btn-secondary" onclick="app.openRequestMoneyModal()">📩 Request Money</button>
             <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ New Goal</button>
           </div>
         </div>
@@ -143,9 +155,7 @@
           <!-- Left Column: Visual Growth Trend -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">
-                Savings Over Time
-              </h3>
+              <h3 class="card-title">Savings Over Time</h3>
               <span class="badge-tag">Last 6 Months</span>
             </div>
             <div id="savingsTrendChart" class="chart-box"></div>
@@ -154,9 +164,7 @@
           <!-- Right Column: Goal Category Distribution -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">
-                Category Breakdown
-              </h3>
+              <h3 class="card-title">Category Breakdown</h3>
             </div>
             <div id="categoryDonutChart"></div>
           </div>
@@ -180,6 +188,7 @@
             <p class="page-subtitle">Manage your individual target goals and completion dates.</p>
           </div>
           <div class="header-actions">
+            <button class="btn btn-secondary" onclick="app.openRequestMoneyModal()">📩 Request Money</button>
             <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ Create Goal</button>
           </div>
         </div>
@@ -189,7 +198,43 @@
         </div>
       </div>
 
-      <!-- TAB 3: SAVINGS LEDGER -->
+      <!-- TAB 3: MONEY REQUESTS -->
+      <div id="tab-requests" class="tab-content" style="display: none;">
+        <div class="header-bar">
+          <div>
+            <h2 class="page-title">Money Requests</h2>
+            <p class="page-subtitle">Request money from other users using their 5-character User Code (e.g. Fj38f).</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="app.openSetPinModal()">🔒 Manage PIN</button>
+            <button class="btn btn-primary" onclick="app.openRequestMoneyModal()">📩 Request Money</button>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Incoming Requests -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Incoming Requests</h3>
+            </div>
+            <div id="incomingRequestsContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Outgoing Requests -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Outgoing Requests</h3>
+            </div>
+            <div id="outgoingRequestsContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: SAVINGS LEDGER -->
       <div id="tab-ledger" class="tab-content" style="display: none;">
         <div class="header-bar">
           <div>
@@ -234,7 +279,7 @@
         </div>
       </div>
 
-      <!-- TAB 4: CALCULATORS & FINANCIAL TOOLS -->
+      <!-- TAB 5: CALCULATORS & FINANCIAL TOOLS -->
       <div id="tab-tools" class="tab-content" style="display: none;">
         <div class="header-bar">
           <div>
@@ -247,9 +292,7 @@
           <!-- Compound Interest Calculator -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">
-                Savings Growth Predictor
-              </h3>
+              <h3 class="card-title">Savings Growth Predictor</h3>
             </div>
 
             <form id="compoundForm">
@@ -296,16 +339,12 @@
           <!-- Bulk Auto-Allocator Card -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">
-                Split Deposit Helper
-              </h3>
+              <h3 class="card-title">Split Deposit Helper</h3>
             </div>
             <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1rem;">
               Enter a single deposit amount to split it across all your active savings goals based on target dates and remaining balances.
             </p>
-            <button class="btn btn-primary" style="width:100%;" onclick="app.openAutoAllocModal()">
-              Split Deposit
-            </button>
+            <button class="btn btn-primary" style="width:100%;" onclick="app.openAutoAllocModal()">Split Deposit</button>
           </div>
         </div>
       </div>
@@ -379,6 +418,69 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="document.getElementById('planModal').close()">Cancel</button>
         <button type="submit" class="btn btn-primary">Save Goal</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MODAL: REQUEST MONEY TO A USER CODE -->
+  <dialog id="requestMoneyModal">
+    <div class="modal-header">
+      <h3 class="modal-title">Request Money</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('requestMoneyModal').close()">✕</button>
+    </div>
+    <form id="requestMoneyForm">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Recipient User Code (e.g. Fj38f) *</label>
+          <input type="text" id="reqRecipientCodeInput" class="form-input" placeholder="e.g. Fj38f" required maxlength="10" style="font-family:var(--font-mono); text-transform:none;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Requested Amount ($) *</label>
+          <input type="number" id="reqAmountInput" class="form-input" placeholder="25.00" min="0.01" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason / Note *</label>
+          <input type="text" id="reqNoteInput" class="form-input" placeholder="e.g. Dinner split, Movie ticket" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Your 4-Digit Security PIN *</label>
+          <input type="password" id="reqPinInput" class="form-input" placeholder="••••" maxlength="4" pattern="\d{4}" required style="font-family:var(--font-mono); letter-spacing:0.2em;">
+          <small style="display:block; margin-top:0.3rem; color:var(--text-muted);">
+            Enter your 4-digit PIN to authorize this money request. 
+            <a href="#" onclick="app.openSetPinModal(); return false;" style="color:var(--accent-emerald);">Set/Change PIN</a>
+          </small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('requestMoneyModal').close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Send Request 📩</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MODAL: SET SECURITY PIN -->
+  <dialog id="setPinModal">
+    <div class="modal-header">
+      <h3 class="modal-title">Set 4-Digit Security PIN</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('setPinModal').close()">✕</button>
+    </div>
+    <form id="setPinForm">
+      <div class="modal-body">
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+          Your 4-digit security PIN is required to authorize outgoing money requests.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Enter 4-Digit PIN *</label>
+          <input type="password" id="newPinInput" class="form-input" placeholder="1234" maxlength="4" pattern="\d{4}" required style="font-family:var(--font-mono); letter-spacing:0.2em; font-size:1.2rem; text-align:center;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('setPinModal').close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save PIN</button>
       </div>
     </form>
   </dialog>

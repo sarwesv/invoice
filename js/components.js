@@ -8,7 +8,7 @@ class UIComponents {
     const totalTarget = store.getTotalTarget();
     const progressPct = store.getOverallProgress();
     const activePlansCount = store.getPlans('all', 'active').length;
-    const monthlyData = store.getMonthlyContributions(2); // compare current month vs last month
+    const monthlyData = store.getMonthlyContributions(2);
     const currentMonthSaved = monthlyData[monthlyData.length - 1]?.amount || 0;
     const lastMonthSaved = monthlyData[monthlyData.length - 2]?.amount || 0;
 
@@ -104,7 +104,6 @@ class UIComponents {
             <span>${analytics.diffDays} days left</span>
           </div>
 
-          <!-- Quick Tap Deposit Buttons -->
           <div style="display:flex; gap:0.4rem; margin-bottom:0.75rem;">
             <button class="chip-btn" style="flex:1; text-align:center; padding:0.35rem 0;" onclick="app.quickAddDeposit('${plan.id}', 5)">+$5</button>
             <button class="chip-btn" style="flex:1; text-align:center; padding:0.35rem 0;" onclick="app.quickAddDeposit('${plan.id}', 10)">+$10</button>
@@ -158,6 +157,91 @@ class UIComponents {
             </button>
           </td>
         </tr>
+      `;
+    }).join('');
+  }
+
+  // 4. Money Requests
+  static renderIncomingRequests(requests, store) {
+    if (!requests || requests.length === 0) {
+      return `<p style="padding:1.5rem; color:var(--text-muted); text-align:center; font-size:0.875rem;">No incoming money requests.</p>`;
+    }
+
+    return requests.map(req => {
+      let statusBadge = '';
+      if (req.status === 'approved') {
+        statusBadge = `<span class="badge-tag" style="background:rgba(16,185,129,0.15); color:var(--accent-emerald);">APPROVED</span>`;
+      } else if (req.status === 'declined') {
+        statusBadge = `<span class="badge-tag" style="background:rgba(244,63,94,0.15); color:var(--accent-rose);">DECLINED</span>`;
+      } else {
+        statusBadge = `<span class="badge-tag" style="background:rgba(245,158,11,0.15); color:var(--accent-amber);">PENDING</span>`;
+      }
+
+      return `
+        <div style="padding:0.9rem; background:var(--bg-tertiary); border:1px solid var(--border-color); border-radius:var(--radius-md); margin-bottom:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.35rem;">
+            <div>
+              <strong style="font-size:0.95rem;">${req.senderName}</strong>
+              <span style="font-size:0.75rem; color:var(--text-muted); margin-left:0.35rem; font-family:var(--font-mono);">(${req.senderCode})</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-weight:800; font-size:1.1rem; color:var(--accent-emerald);">
+              ${store.currency}${req.amount.toLocaleString()}
+            </div>
+          </div>
+
+          <div style="font-size:0.825rem; color:var(--text-muted); margin-bottom:0.6rem;">
+            Note: "${req.note}" • <span style="font-size:0.75rem;">${req.createdAt}</span>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            ${statusBadge}
+            ${req.status === 'pending' ? `
+              <div style="display:flex; gap:0.4rem;">
+                <button class="btn btn-primary btn-sm" onclick="app.updateMoneyRequestStatus('${req.id}', 'approved')">Approve</button>
+                <button class="btn btn-outline btn-sm" onclick="app.updateMoneyRequestStatus('${req.id}', 'declined')">Decline</button>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  static renderOutgoingRequests(requests, store) {
+    if (!requests || requests.length === 0) {
+      return `<p style="padding:1.5rem; color:var(--text-muted); text-align:center; font-size:0.875rem;">No outgoing money requests sent yet.</p>`;
+    }
+
+    return requests.map(req => {
+      let statusBadge = '';
+      if (req.status === 'approved') {
+        statusBadge = `<span class="badge-tag" style="background:rgba(16,185,129,0.15); color:var(--accent-emerald);">APPROVED</span>`;
+      } else if (req.status === 'declined') {
+        statusBadge = `<span class="badge-tag" style="background:rgba(244,63,94,0.15); color:var(--accent-rose);">DECLINED</span>`;
+      } else {
+        statusBadge = `<span class="badge-tag" style="background:rgba(245,158,11,0.15); color:var(--accent-amber);">PENDING</span>`;
+      }
+
+      return `
+        <div style="padding:0.9rem; background:var(--bg-tertiary); border:1px solid var(--border-color); border-radius:var(--radius-md); margin-bottom:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.35rem;">
+            <div>
+              <span style="font-size:0.825rem; color:var(--text-muted);">Sent to Code:</span>
+              <strong style="font-family:var(--font-mono); font-size:0.95rem; margin-left:0.25rem;">${req.recipientCode}</strong>
+            </div>
+            <div style="font-family:var(--font-mono); font-weight:800; font-size:1.1rem; color:var(--text-main);">
+              ${store.currency}${req.amount.toLocaleString()}
+            </div>
+          </div>
+
+          <div style="font-size:0.825rem; color:var(--text-muted); margin-bottom:0.6rem;">
+            Note: "${req.note}" • <span style="font-size:0.75rem;">${req.createdAt}</span>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            ${statusBadge}
+          </div>
+        </div>
       `;
     }).join('');
   }

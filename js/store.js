@@ -2,6 +2,8 @@
  * VaultCraft Store - State Management & Storage Layer
  */
 const STORAGE_KEY = 'vaultcraft_savings_data_v1';
+const REQUESTS_KEY = 'vaultcraft_money_requests_v1';
+const USER_PROFILE_KEY = 'vaultcraft_user_profile_v1';
 
 const DEFAULT_PLANS = [];
 const DEFAULT_TRANSACTIONS = [];
@@ -10,9 +12,123 @@ class Store {
   constructor() {
     this.plans = [];
     this.transactions = [];
+    this.moneyRequests = [];
+    this.userCode = '';
+    this.userPin = null;
     this.currency = '$';
     this.theme = 'dark';
     this.loadState();
+    this.loadUserProfile();
+    this.loadMoneyRequests();
+  }
+
+  generateUserCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+    let code = '';
+    for (let i = 0; i < 5; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  loadUserProfile() {
+    try {
+      const raw = localStorage.getItem(USER_PROFILE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        this.userCode = parsed.userCode || this.generateUserCode();
+        this.userPin = parsed.userPin || null;
+      } else {
+        this.userCode = this.generateUserCode();
+        this.userPin = null;
+        this.saveUserProfile();
+      }
+    } catch (e) {
+      this.userCode = this.generateUserCode();
+      this.userPin = null;
+    }
+  }
+
+  saveUserProfile() {
+    try {
+      localStorage.setItem(USER_PROFILE_KEY, JSON.stringify({
+        userCode: this.userCode,
+        userPin: this.userPin
+      }));
+    } catch (e) {
+      console.error('Error saving user profile:', e);
+    }
+  }
+
+  setUserPin(pin) {
+    if (/^\d{4}$/.test(pin)) {
+      this.userPin = pin;
+      this.saveUserProfile();
+      return true;
+    }
+    return false;
+  }
+
+  verifyPin(pin) {
+    return this.userPin && this.userPin === pin;
+  }
+
+  loadMoneyRequests() {
+    try {
+      const raw = localStorage.getItem(REQUESTS_KEY);
+      if (raw) {
+        this.moneyRequests = JSON.parse(raw) || [];
+      } else {
+        this.moneyRequests = [];
+      }
+    } catch (e) {
+      this.moneyRequests = [];
+    }
+  }
+
+  saveMoneyRequests() {
+    try {
+      localStorage.setItem(REQUESTS_KEY, JSON.stringify(this.moneyRequests));
+    } catch (e) {
+      console.error('Error saving money requests:', e);
+    }
+  }
+
+  createMoneyRequest(recipientCode, amount, goalId = '', note = '') {
+    const id = 'req_' + Date.now();
+    const newRequest = {
+      id,
+      senderCode: this.userCode,
+      senderName: window.currentUser ? (window.currentUser.displayName || window.currentUser.email) : 'User',
+      recipientCode: recipientCode.trim(),
+      amount: parseFloat(amount) || 0,
+      goalId,
+      note: note.trim() || 'Money Request',
+      status: 'pending', // 'pending', 'approved', 'declined'
+      createdAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    this.moneyRequests.unshift(newRequest);
+    this.saveMoneyRequests();
+    return newRequest;
+  }
+
+  getIncomingRequests() {
+    return this.moneyRequests.filter(r => r.recipientCode === this.userCode || r.recipientCode.toLowerCase() === this.userCode.toLowerCase());
+  }
+
+  getOutgoingRequests() {
+    return this.moneyRequests.filter(r => r.senderCode === this.userCode || r.senderCode.toLowerCase() === this.userCode.toLowerCase());
+  }
+
+  updateRequestStatus(requestId, status) {
+    const req = this.moneyRequests.find(r => r.id === requestId);
+    if (req) {
+      req.status = status;
+      this.saveMoneyRequests();
+      return req;
+    }
+    return null;
   }
 
   loadState() {
@@ -25,7 +141,6 @@ class Store {
         this.currency = parsed.currency || '$';
         this.theme = parsed.theme || 'dark';
 
-        // Reconcile current amounts from transaction history to ensure 100% data accuracy
         this.reconcilePlanBalances();
       } else {
         this.plans = DEFAULT_PLANS;
@@ -89,7 +204,7 @@ class Store {
       title: planData.title.trim(),
       category: planData.category || 'General',
       targetAmount: parseFloat(planData.targetAmount) || 0,
-      currentAmount: 0, // Starts at 0; initial deposit transaction will set it
+      currentAmount: 0,
       targetDate: planData.targetDate,
       startDate: new Date().toISOString().split('T')[0],
       icon: planData.icon || '🎯',
@@ -102,7 +217,6 @@ class Store {
 
     this.plans.unshift(newPlan);
 
-    // Record initial deposit as a transaction if > 0
     if (initialDeposit > 0) {
       this.addTransaction({
         planId: id,
@@ -149,7 +263,7 @@ class Store {
     const amount = parseFloat(txData.amount) || 0;
     if (amount <= 0) return null;
 
-    const type = txData.type || 'deposit'; // 'deposit' or 'withdrawal'
+    const type = txData.type || 'deposit';
 
     const newTx = {
       id,
@@ -196,7 +310,7 @@ class Store {
     
     for (let i = monthsCount - 1; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const monthStr = d.toISOString().slice(0, 7); // YYYY-MM
+      const monthStr = d.toISOString().slice(0, 7);
       const label = d.toLocaleString('default', { month: 'short', year: '2-digit' });
       
       const monthlyTotal = this.transactions
@@ -270,6 +384,7 @@ class Store {
     const data = {
       plans: this.plans,
       transactions: this.transactions,
+      userCode: this.userCode,
       currency: this.currency,
       version: '1.0',
       exportedAt: new Date().toISOString()
