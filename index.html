@@ -65,14 +65,6 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
 
-        <div style="display:flex; gap:0.5rem;">
-          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="app.openBackupModal()" title="Data Backup / Export">
-            💾 Backup
-          </button>
-          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="app.openGitHubPagesModal()" title="Deploy to GitHub Pages">
-            🚀 Deploy
-          </button>
-        </div>
       </div>
     </aside>
 
@@ -446,78 +438,6 @@
         <button type="submit" class="btn btn-primary">Apply & Deposit All</button>
       </div>
     </form>
-  </dialog>
-
-  <!-- MODAL: BACKUP & DATA MANAGEMENT -->
-  <dialog id="backupModal">
-    <div class="modal-header">
-      <h3 class="modal-title">Data Backup & Export</h3>
-      <button class="modal-close-btn" onclick="document.getElementById('backupModal').close()">✕</button>
-    </div>
-    <div class="modal-body">
-      <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1.25rem;">
-        Your savings data is stored locally in your browser's LocalStorage. Backup your data to JSON to transfer between devices or restore later.
-      </p>
-
-      <div style="display:flex; flex-direction:column; gap:1rem;">
-        <button class="btn btn-primary" onclick="window.store.exportJSON()">
-          📥 Export Backup (JSON)
-        </button>
-
-        <div style="padding:1rem; border:1px dashed var(--border-color); border-radius:var(--radius-md); text-align:center;">
-          <label class="form-label" style="margin-bottom:0.5rem;">Restore from JSON Backup File</label>
-          <input type="file" id="importJsonInput" accept=".json" style="display:none;" onchange="app.importJSONFile(this)">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('importJsonInput').click()">
-            📂 Select Backup File...
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" onclick="document.getElementById('backupModal').close()">Close</button>
-    </div>
-  </dialog>
-
-  <!-- MODAL: GITHUB PAGES DEPLOYMENT GUIDE -->
-  <dialog id="ghPagesModal">
-    <div class="modal-header">
-      <h3 class="modal-title">🚀 How to Deploy on GitHub Pages</h3>
-      <button class="modal-close-btn" onclick="document.getElementById('ghPagesModal').close()">✕</button>
-    </div>
-    <div class="modal-body">
-      <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1rem;">
-        VaultCraft is built as a zero-dependency static web application, making it 100% compatible with GitHub Pages out of the box!
-      </p>
-
-      <ol style="margin-left:1.25rem; font-size:0.875rem; display:flex; flex-direction:column; gap:0.75rem;">
-        <li>
-          <strong>Create a GitHub Repository:</strong>
-          <p>Create a new repository on GitHub (e.g., <code>vaultcraft-savings</code>).</p>
-        </li>
-        <li>
-          <strong>Push your code to GitHub:</strong>
-          <div class="code-block">
-git init
-git add .
-git commit -m "Initial VaultCraft release"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/vaultcraft-savings.git
-git push -u origin main
-          </div>
-        </li>
-        <li>
-          <strong>Enable GitHub Pages:</strong>
-          <p>Go to repository <strong>Settings → Pages → Build and deployment</strong>. Select <code>Source: Deploy from a branch</code>, choose <code>main</code> branch and <code>/ (root)</code> folder, then click <strong>Save</strong>.</p>
-        </li>
-        <li>
-          <strong>Your Savings App is Live!</strong>
-          <p>Your app will be instantly accessible at <code>https://YOUR_USERNAME.github.io/vaultcraft-savings/</code>.</p>
-        </li>
-      </ol>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-primary" onclick="document.getElementById('ghPagesModal').close()">Got it!</button>
-    </div>
   </dialog>
 
   <!-- Toast Notifications Container -->
