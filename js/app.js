@@ -351,6 +351,14 @@ class App {
     this.render();
   }
 
+  resetAllData() {
+    if (confirm('Are you sure you want to clear all savings goals and history? This will start with a clean, empty workspace.')) {
+      window.store.clearAllData();
+      this.showToast('All saved goals cleared.');
+      this.render();
+    }
+  }
+
   deletePlan(planId) {
     if (confirm('Are you sure you want to delete this savings plan? Associated log transactions will also be removed.')) {
       window.store.deletePlan(planId);

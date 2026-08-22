@@ -1,7 +1,7 @@
 /**
  * VaultCraft Store - State Management & Storage Layer
  */
-const STORAGE_KEY = 'vaultcraft_savings_data_v1';
+const STORAGE_KEY = 'vaultcraft_savings_data_v2';
 const REQUESTS_KEY = 'vaultcraft_money_requests_v1';
 const USER_PROFILE_KEY = 'vaultcraft_user_profile_v1';
 const PIN_REGISTRY_KEY = 'vaultcraft_pin_registry_v1';
@@ -204,6 +204,16 @@ class Store {
       }, 0);
       plan.currentAmount = Math.max(0, total);
     });
+  }
+
+  clearAllData() {
+    this.plans = [];
+    this.transactions = [];
+    this.saveState();
+    try {
+      localStorage.removeItem('vaultcraft_savings_data_v1');
+      localStorage.removeItem('vaultcraft_savings_data_v2');
+    } catch(e) {}
   }
 
   saveState() {
