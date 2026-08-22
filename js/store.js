@@ -4,7 +4,6 @@
 const STORAGE_KEY = 'vaultcraft_savings_data_v2';
 const REQUESTS_KEY = 'vaultcraft_money_requests_v1';
 const USER_PROFILE_KEY = 'vaultcraft_user_profile_v1';
-const PIN_REGISTRY_KEY = 'vaultcraft_pin_registry_v1';
 
 const DEFAULT_PLANS = [];
 const DEFAULT_TRANSACTIONS = [];
@@ -15,7 +14,7 @@ class Store {
     this.transactions = [];
     this.moneyRequests = [];
     this.userCode = '';
-    this.userPin = null;
+    this.userPin = '';
     this.currency = '$';
     this.theme = 'dark';
     this.loadState();
@@ -38,79 +37,30 @@ class Store {
       if (raw) {
         const parsed = JSON.parse(raw);
         this.userCode = parsed.userCode || this.generateUserCode();
-        this.userPin = parsed.userPin || null;
       } else {
         this.userCode = this.generateUserCode();
-        this.userPin = null;
         this.saveUserProfile();
       }
     } catch (e) {
       this.userCode = this.generateUserCode();
-      this.userPin = null;
     }
+    // The PIN is the same exact thing as the unique User Code (e.g. Fj38f)
+    this.userPin = this.userCode;
   }
 
   saveUserProfile() {
     try {
       localStorage.setItem(USER_PROFILE_KEY, JSON.stringify({
-        userCode: this.userCode,
-        userPin: this.userPin
+        userCode: this.userCode
       }));
     } catch (e) {
       console.error('Error saving user profile:', e);
     }
   }
 
-  getPinRegistry() {
-    try {
-      const raw = localStorage.getItem(PIN_REGISTRY_KEY);
-      return raw ? JSON.parse(raw) : {};
-    } catch (e) {
-      return {};
-    }
-  }
-
-  savePinRegistry(registry) {
-    try {
-      localStorage.setItem(PIN_REGISTRY_KEY, JSON.stringify(registry));
-    } catch (e) {
-      console.error('Error saving PIN registry:', e);
-    }
-  }
-
-  isPinAvailable(pin) {
-    if (!/^\d{4}$/.test(pin)) return false;
-    const registry = this.getPinRegistry();
-    const existingOwner = registry[pin];
-    return !existingOwner || existingOwner === this.userCode;
-  }
-
-  setUserPin(pin) {
-    if (!/^\d{4}$/.test(pin)) {
-      return { success: false, message: 'PIN must be exactly 4 digits (numbers only).' };
-    }
-    
-    const registry = this.getPinRegistry();
-    if (registry[pin] && registry[pin] !== this.userCode) {
-      return { success: false, message: 'This PIN is already used by another user code. Every PIN must be unique! Please pick a different 4-digit PIN.' };
-    }
-
-    // Remove old PIN assignment for this user code if exists
-    if (this.userPin && registry[this.userPin] === this.userCode) {
-      delete registry[this.userPin];
-    }
-
-    // Register new PIN
-    registry[pin] = this.userCode;
-    this.savePinRegistry(registry);
-
-    this.userPin = pin;
-    this.saveUserProfile();
-    return { success: true };
-  }
-
   verifyPin(pin) {
-    return this.userPin && this.userPin === pin;
+    if (!pin) return false;
+    return pin.trim() === this.userCode;
   }
 
   loadMoneyRequests() {

@@ -117,11 +117,6 @@ class App {
       requestMoneyForm.addEventListener('submit', (e) => this.handleRequestMoneySubmit(e));
     }
 
-    const setPinForm = document.getElementById('setPinForm');
-    if (setPinForm) {
-      setPinForm.addEventListener('submit', (e) => this.handleSetPinSubmit(e));
-    }
-
     const allocForm = document.getElementById('allocForm');
     if (allocForm) {
       allocForm.addEventListener('submit', (e) => this.handleAutoAllocSubmit(e));
@@ -425,12 +420,6 @@ class App {
 
   // --- Money Requests Modals & Handlers ---
   openRequestMoneyModal() {
-    if (!window.store.userPin) {
-      this.showToast('Please set your 4-digit PIN first.');
-      this.openSetPinModal();
-      return;
-    }
-
     document.getElementById('reqRecipientCodeInput').value = '';
     document.getElementById('reqAmountInput').value = '';
     document.getElementById('reqNoteInput').value = '';
@@ -443,7 +432,7 @@ class App {
     const recipientCode = document.getElementById('reqRecipientCodeInput').value.trim();
     const amount = parseFloat(document.getElementById('reqAmountInput').value) || 0;
     const note = document.getElementById('reqNoteInput').value;
-    const pin = document.getElementById('reqPinInput').value;
+    const pin = document.getElementById('reqPinInput').value.trim();
 
     if (recipientCode.toLowerCase() === window.store.userCode.toLowerCase()) {
       alert('You cannot send a money request to your own User Code!');
@@ -451,7 +440,7 @@ class App {
     }
 
     if (!window.store.verifyPin(pin)) {
-      alert('Incorrect 4-digit Security PIN. Please try again.');
+      alert(`Incorrect Security Code/PIN! Your PIN is your User Code: ${window.store.userCode}`);
       return;
     }
 
@@ -464,23 +453,6 @@ class App {
     document.getElementById('requestMoneyModal').close();
     this.showToast(`Request for $${amount} sent to code ${recipientCode}!`);
     this.switchTab('requests');
-  }
-
-  openSetPinModal() {
-    document.getElementById('newPinInput').value = '';
-    document.getElementById('setPinModal').showModal();
-  }
-
-  handleSetPinSubmit(e) {
-    e.preventDefault();
-    const pin = document.getElementById('newPinInput').value.trim();
-    const res = window.store.setUserPin(pin);
-    if (res.success) {
-      document.getElementById('setPinModal').close();
-      this.showToast('4-digit Unique Security PIN saved!');
-    } else {
-      alert(res.message);
-    }
   }
 
   updateMoneyRequestStatus(requestId, status) {

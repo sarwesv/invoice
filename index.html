@@ -206,7 +206,6 @@
             <p class="page-subtitle">Request money from other users using their 5-character User Code (e.g. Fj38f).</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-outline" onclick="app.openSetPinModal()">🔒 Manage PIN</button>
             <button class="btn btn-primary" onclick="app.openRequestMoneyModal()">📩 Request Money</button>
           </div>
         </div>
@@ -446,41 +445,16 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Your 4-Digit Security PIN *</label>
-          <input type="password" id="reqPinInput" class="form-input" placeholder="••••" maxlength="4" pattern="\d{4}" required style="font-family:var(--font-mono); letter-spacing:0.2em;">
+          <label class="form-label">Your Security Code / PIN *</label>
+          <input type="text" id="reqPinInput" class="form-input" placeholder="e.g. Fj38f" required style="font-family:var(--font-mono);">
           <small style="display:block; margin-top:0.3rem; color:var(--text-muted);">
-            Enter your 4-digit PIN to authorize this money request. 
-            <a href="#" onclick="app.openSetPinModal(); return false;" style="color:var(--accent-emerald);">Set/Change PIN</a>
+            Type your 5-character User Code to authorize this money request.
           </small>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="document.getElementById('requestMoneyModal').close()">Cancel</button>
         <button type="submit" class="btn btn-primary">Send Request 📩</button>
-      </div>
-    </form>
-  </dialog>
-
-  <!-- MODAL: SET SECURITY PIN -->
-  <dialog id="setPinModal">
-    <div class="modal-header">
-      <h3 class="modal-title">Set 4-Digit Security PIN</h3>
-      <button class="modal-close-btn" onclick="document.getElementById('setPinModal').close()">✕</button>
-    </div>
-    <form id="setPinForm">
-      <div class="modal-body">
-        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
-          Your 4-digit security PIN is required to authorize outgoing money requests.
-        </p>
-
-        <div class="form-group">
-          <label class="form-label">Enter 4-Digit PIN *</label>
-          <input type="password" id="newPinInput" class="form-input" placeholder="1234" maxlength="4" pattern="\d{4}" required style="font-family:var(--font-mono); letter-spacing:0.2em; font-size:1.2rem; text-align:center;">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="document.getElementById('setPinModal').close()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save PIN</button>
       </div>
     </form>
   </dialog>
