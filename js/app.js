@@ -277,6 +277,22 @@ class App {
     }
   }
 
+  quickAddDeposit(planId, amount) {
+    const plan = window.store.getPlanById(planId);
+    if (!plan) return;
+
+    window.store.addTransaction({
+      planId,
+      amount,
+      type: 'deposit',
+      date: new Date().toISOString().split('T')[0],
+      note: `Quick deposit +$${amount}`
+    });
+
+    this.showToast(`Awesome! Added $${amount} to ${plan.title}! 🎉`);
+    this.render();
+  }
+
   openDepositModal(planId = '', type = 'deposit') {
     const select = document.getElementById('txPlanSelect');
     select.innerHTML = window.store.plans.map(p => `<option value="${p.id}" ${p.id === planId ? 'selected' : ''}>${p.icon} ${p.title} (${window.store.currency}${p.currentAmount.toLocaleString()})</option>`).join('');
