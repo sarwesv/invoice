@@ -651,8 +651,19 @@ class App {
     const bodyEl = document.getElementById('confirmModalBody');
     const actionBtn = document.getElementById('confirmModalActionBtn');
 
-    if (!modal) {
-      if (window.confirm(message)) onConfirmCallback();
+    const closeModal = () => {
+      if (!modal) return;
+      try {
+        if (modal.hasAttribute('open')) modal.close();
+      } catch (e) {
+        modal.removeAttribute('open');
+      }
+    };
+
+    if (!modal || typeof modal.showModal !== 'function') {
+      if (window.confirm(`${title ? title + ':\n' : ''}${message}`)) {
+        if (typeof onConfirmCallback === 'function') onConfirmCallback();
+      }
       return;
     }
 
@@ -662,14 +673,37 @@ class App {
     const newBtn = actionBtn.cloneNode(true);
     actionBtn.parentNode.replaceChild(newBtn, actionBtn);
 
-    newBtn.addEventListener('click', () => {
-      modal.close();
-      if (typeof onConfirmCallback === 'function') {
-        onConfirmCallback();
-      }
-    });
+    newBtn.onclick = (e) => {
+      e.preventDefault();
+      closeModal();
+      setTimeout(() => {
+        if (typeof onConfirmCallback === 'function') {
+          onConfirmCallback();
+        }
+      }, 30);
+    };
 
-    modal.showModal();
+    modal.onclick = (e) => {
+      const rect = modal.getBoundingClientRect();
+      const isInside = (
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom
+      );
+      if (!isInside) {
+        closeModal();
+      }
+    };
+
+    try {
+      modal.showModal();
+    } catch(err) {
+      if (window.confirm(`${title ? title + ':\n' : ''}${message}`)) {
+        closeModal();
+        if (typeof onConfirmCallback === 'function') onConfirmCallback();
+      }
+    }
   }
 
   showToast(message, type = 'success') {
