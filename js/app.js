@@ -18,7 +18,22 @@ class App {
         window.initFirebaseAuth();
       }
       this.render();
+
+      setTimeout(() => {
+        this.hideSplashScreen();
+      }, 1400);
     });
+  }
+
+  hideSplashScreen() {
+    const splash = document.getElementById('splashScreen');
+    if (splash && !this.splashHidden) {
+      this.splashHidden = true;
+      splash.classList.add('fade-out');
+      setTimeout(() => {
+        splash.style.display = 'none';
+      }, 500);
+    }
   }
 
   updateUserCodeDisplay() {
@@ -44,6 +59,7 @@ class App {
     const authContainer = document.getElementById('authContainer');
 
     this.updateUserCodeDisplay();
+    this.hideSplashScreen();
 
     if (user) {
       if (loginScreen) loginScreen.style.display = 'none';
