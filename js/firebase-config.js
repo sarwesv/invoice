@@ -62,9 +62,7 @@ async function signInWithGoogle() {
     const result = await auth.signInWithPopup(googleProvider);
     const user = result.user;
     if (window.app) {
-      const isPrivacyOn = localStorage.getItem('vaultcraft_hide_account_name') === 'true';
-      const label = isPrivacyOn ? 'Account Hidden 🔒' : (user.displayName || user.email);
-      window.app.showToast(`Signed in successfully as ${label}`, 'success');
+      window.app.showToast('Signed in successfully! 🎉', 'success');
     }
     return user;
   } catch (error) {
