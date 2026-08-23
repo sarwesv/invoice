@@ -3,7 +3,8 @@
  */
 const STORAGE_KEY = 'vaultcraft_savings_data_v2';
 const REQUESTS_KEY = 'vaultcraft_money_requests_v1';
-const USER_PROFILE_KEY = 'vaultcraft_user_profile_v1';
+const USER_CAP_COUNT_KEY = 'vaultcraft_user_cap_count_v1';
+const USER_CAP_LIST_KEY = 'vaultcraft_user_cap_list_v1';
 
 const DEFAULT_PLANS = [];
 const DEFAULT_TRANSACTIONS = [];
@@ -17,9 +18,15 @@ class Store {
     this.userPin = '';
     this.currency = '$';
     this.theme = 'dark';
+
+    this.maxUserCap = 2000;
+    this.registeredUsersCount = 1;
+    this.registeredUsersList = [];
+
     this.loadState();
     this.loadUserProfile();
     this.loadMoneyRequests();
+    this.loadUserCapState();
   }
 
   generateUserCode() {
@@ -61,6 +68,60 @@ class Store {
   verifyPin(pin) {
     if (!pin) return false;
     return pin.trim() === this.userCode;
+  }
+
+  loadUserCapState() {
+    try {
+      const rawCount = localStorage.getItem(USER_CAP_COUNT_KEY);
+      this.registeredUsersCount = rawCount !== null ? parseInt(rawCount, 10) : 1;
+
+      const rawList = localStorage.getItem(USER_CAP_LIST_KEY);
+      this.registeredUsersList = rawList ? JSON.parse(rawList) : [this.userCode];
+    } catch (e) {
+      this.registeredUsersCount = 1;
+      this.registeredUsersList = [this.userCode];
+    }
+  }
+
+  saveUserCapState() {
+    try {
+      localStorage.setItem(USER_CAP_COUNT_KEY, this.registeredUsersCount.toString());
+      localStorage.setItem(USER_CAP_LIST_KEY, JSON.stringify(this.registeredUsersList));
+    } catch (e) {
+      console.error('Error saving user cap state:', e);
+    }
+  }
+
+  isUserCapReached(userId = '') {
+    const id = userId || this.userCode;
+    const isAlreadyRegistered = this.registeredUsersList.includes(id);
+    if (isAlreadyRegistered) return false;
+    return this.registeredUsersCount >= this.maxUserCap;
+  }
+
+  registerUser(userId = '') {
+    const id = userId || this.userCode;
+    if (this.registeredUsersList.includes(id)) {
+      return { success: true, count: this.registeredUsersCount };
+    }
+
+    if (this.registeredUsersCount >= this.maxUserCap) {
+      return { success: false, reason: 'capacity_reached', count: this.registeredUsersCount };
+    }
+
+    this.registeredUsersList.push(id);
+    this.registeredUsersCount = this.registeredUsersList.length;
+    this.saveUserCapState();
+    return { success: true, count: this.registeredUsersCount };
+  }
+
+  setSimulatedUserCount(count) {
+    this.registeredUsersCount = count;
+    this.registeredUsersList = [this.userCode];
+    for (let i = 1; i < count; i++) {
+      this.registeredUsersList.push(`user_${i}`);
+    }
+    this.saveUserCapState();
   }
 
   loadMoneyRequests() {
