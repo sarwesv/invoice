@@ -316,55 +316,63 @@
       <div id="tab-tools" class="tab-content" style="display: none;">
         <div class="header-bar">
           <div>
-            <h2 class="page-title">Savings Growth Predictor</h2>
-            <p class="page-subtitle">See how fast your money can grow over time when you save regularly!</p>
+            <h2 class="page-title">Savings Goal Calculator</h2>
+            <p class="page-subtitle">Enter your goal amount and timeframe to calculate how much to save daily or monthly!</p>
           </div>
         </div>
 
         <div class="dashboard-grid">
-          <!-- Compound Interest Calculator -->
+          <!-- Kid Goal Savings Calculator -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Growth Predictor</h3>
+              <h3 class="card-title">Goal Savings Calculator 🎯</h3>
             </div>
 
-            <form id="compoundForm">
+            <form id="goalCalcForm" onsubmit="return false;">
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Starting Money ($)</label>
-                  <input type="number" id="compoundPrincipal" class="form-input" value="100">
+                  <label class="form-label">Goal Target Amount ($) *</label>
+                  <input type="number" id="calcGoalTarget" class="form-input" value="100" min="1" placeholder="100" oninput="app.calculateGoalPlanner()">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Monthly Savings ($)</label>
-                  <input type="number" id="compoundMonthly" class="form-input" value="50">
+                  <label class="form-label">Already Saved ($)</label>
+                  <input type="number" id="calcAlreadySaved" class="form-input" value="0" min="0" placeholder="0" oninput="app.calculateGoalPlanner()">
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Annual Growth Rate (%)</label>
-                  <input type="number" id="compoundRate" class="form-input" step="0.1" value="5.0">
+                  <label class="form-label">Time Period *</label>
+                  <input type="number" id="calcTimeVal" class="form-input" value="2" min="1" oninput="app.calculateGoalPlanner()">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Time Period (Years)</label>
-                  <input type="number" id="compoundYears" class="form-input" value="5">
+                  <label class="form-label">Time Unit</label>
+                  <select id="calcTimeUnit" class="form-select" onchange="app.calculateGoalPlanner()">
+                    <option value="months" selected>Months</option>
+                    <option value="weeks">Weeks</option>
+                    <option value="days">Days</option>
+                  </select>
                 </div>
               </div>
             </form>
 
             <div style="margin-top:1.5rem; padding:1.25rem; background:var(--bg-tertiary); border-radius:var(--radius-md); border:1px solid var(--border-color);">
-              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:1rem; text-align:center;">
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:1rem; text-align:center; margin-bottom:1rem;">
                 <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL FUTURE BALANCE</span>
-                  <div id="compoundTotalVal" style="font-size:1.5rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-emerald);">$0</div>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">DAILY NEEDED</span>
+                  <div id="calcDailyVal" style="font-size:1.4rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-emerald);">$1.64</div>
                 </div>
                 <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL SAVED</span>
-                  <div id="compoundTotalDeposited" style="font-size:1.2rem; font-weight:700; font-family:var(--font-mono);">$0</div>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">WEEKLY NEEDED</span>
+                  <div id="calcWeeklyVal" style="font-size:1.3rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-purple);">$11.54</div>
                 </div>
                 <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">EXTRA INTEREST GAINED</span>
-                  <div id="compoundTotalInterest" style="font-size:1.2rem; font-weight:700; font-family:var(--font-mono); color:var(--accent-cyan);">$0</div>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">MONTHLY NEEDED</span>
+                  <div id="calcMonthlyVal" style="font-size:1.3rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-amber);">$50.00</div>
                 </div>
+              </div>
+
+              <div id="calcSummaryMessage" style="padding:0.75rem 1rem; background:rgba(16,185,129,0.12); border-radius:var(--radius-sm); border:1px solid rgba(16,185,129,0.25); text-align:center; font-size:0.875rem; color:var(--text-main);">
+                🎯 To reach your <strong>$100</strong> goal in <strong>2 Months</strong>, you need to save <strong>$1.64 a day</strong> or <strong>$11.54 a week</strong>! 🚀
               </div>
             </div>
           </div>
@@ -372,10 +380,10 @@
           <!-- Bulk Auto-Allocator Card -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Smart Split Helper</h3>
+              <h3 class="card-title">Smart Split Helper 🍰</h3>
             </div>
-            <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1rem;">
-              Enter money you received to automatically split it across all your active savings goals!
+            <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1.25rem; line-height:1.5;">
+              Got allowance or birthday money? Enter the total amount you received, and Smart Split will divide it among all your active goals!
             </p>
             <button class="btn btn-primary" style="width:100%;" onclick="app.openAutoAllocModal()">Split Deposit Now</button>
           </div>

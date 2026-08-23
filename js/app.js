@@ -147,9 +147,9 @@ class App {
       allocForm.addEventListener('submit', (e) => this.handleAutoAllocSubmit(e));
     }
 
-    const compoundForm = document.getElementById('compoundForm');
-    if (compoundForm) {
-      compoundForm.addEventListener('input', () => this.calculateCompoundInterest());
+    const goalCalcForm = document.getElementById('goalCalcForm');
+    if (goalCalcForm) {
+      goalCalcForm.addEventListener('input', () => this.calculateGoalPlanner());
     }
 
     // Color picker swatches
@@ -214,7 +214,7 @@ class App {
     } else if (this.currentTab === 'ledger') {
       this.renderLedger();
     } else if (this.currentTab === 'tools') {
-      this.calculateCompoundInterest();
+      this.calculateGoalPlanner();
     }
   }
 
@@ -539,31 +539,56 @@ class App {
     this.render();
   }
 
-  calculateCompoundInterest() {
-    const principal = parseFloat(document.getElementById('compoundPrincipal')?.value) || 100;
-    const monthlyDep = parseFloat(document.getElementById('compoundMonthly')?.value) || 50;
-    const ratePct = parseFloat(document.getElementById('compoundRate')?.value) || 5;
-    const years = parseInt(document.getElementById('compoundYears')?.value) || 5;
+  calculateGoalPlanner() {
+    const goalAmount = parseFloat(document.getElementById('calcGoalTarget')?.value) || 0;
+    const savedAlready = parseFloat(document.getElementById('calcAlreadySaved')?.value) || 0;
+    const timeVal = parseFloat(document.getElementById('calcTimeVal')?.value) || 1;
+    const timeUnit = document.getElementById('calcTimeUnit')?.value || 'months';
 
-    const r = ratePct / 100 / 12;
-    const n = years * 12;
-    let balance = principal;
-    let totalDeposited = principal;
+    const remaining = Math.max(0, goalAmount - savedAlready);
 
-    for (let i = 0; i < n; i++) {
-      balance = (balance + monthlyDep) * (1 + r);
-      totalDeposited += monthlyDep;
+    let days = 30;
+    let weeks = 4.333;
+    let months = 1;
+
+    if (timeUnit === 'days') {
+      days = Math.max(1, timeVal);
+      weeks = days / 7;
+      months = days / 30.417;
+    } else if (timeUnit === 'weeks') {
+      weeks = Math.max(1, timeVal);
+      days = weeks * 7;
+      months = weeks / 4.333;
+    } else {
+      // months
+      months = Math.max(1, timeVal);
+      days = months * 30.417;
+      weeks = months * 4.333;
     }
 
-    const interestEarned = balance - totalDeposited;
+    const dailyNeeded = remaining / days;
+    const weeklyNeeded = remaining / weeks;
+    const monthlyNeeded = remaining / months;
 
-    const resVal = document.getElementById('compoundTotalVal');
-    const resDep = document.getElementById('compoundTotalDeposited');
-    const resInt = document.getElementById('compoundTotalInterest');
+    const resDaily = document.getElementById('calcDailyVal');
+    const resWeekly = document.getElementById('calcWeeklyVal');
+    const resMonthly = document.getElementById('calcMonthlyVal');
+    const resSummary = document.getElementById('calcSummaryMessage');
 
-    if (resVal) resVal.textContent = `${window.store.currency}${Math.round(balance).toLocaleString()}`;
-    if (resDep) resDep.textContent = `${window.store.currency}${Math.round(totalDeposited).toLocaleString()}`;
-    if (resInt) resInt.textContent = `${window.store.currency}${Math.round(interestEarned).toLocaleString()}`;
+    const curr = window.store ? window.store.currency : '$';
+
+    if (resDaily) resDaily.textContent = `${curr}${dailyNeeded.toFixed(2)}`;
+    if (resWeekly) resWeekly.textContent = `${curr}${weeklyNeeded.toFixed(2)}`;
+    if (resMonthly) resMonthly.textContent = `${curr}${monthlyNeeded.toFixed(2)}`;
+
+    if (resSummary) {
+      if (remaining <= 0) {
+        resSummary.innerHTML = `🎉 You already have enough saved to reach your goal!`;
+      } else {
+        const unitLabel = timeVal === 1 ? timeUnit.replace(/s$/, '') : timeUnit;
+        resSummary.innerHTML = `🎯 To reach your <strong>${curr}${goalAmount.toLocaleString()}</strong> goal in <strong>${timeVal} ${unitLabel}</strong>, you need to save <strong>${curr}${dailyNeeded.toFixed(2)} a day</strong>, <strong>${curr}${weeklyNeeded.toFixed(2)} a week</strong>, or <strong>${curr}${monthlyNeeded.toFixed(2)} a month</strong>! 🚀`;
+      }
+    }
   }
 
   showToast(message) {
