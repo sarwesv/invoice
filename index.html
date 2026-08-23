@@ -570,6 +570,19 @@
         <button type="submit" class="btn btn-primary">Apply Split</button>
       </div>
     </form>
+  <!-- MODAL: IN-APP CONFIRMATION DIALOG -->
+  <dialog id="confirmModal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="confirmModalTitle">Are you sure?</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('confirmModal').close()">✕</button>
+    </div>
+    <div class="modal-body" id="confirmModalBody" style="font-size:0.95rem; color:var(--text-main); line-height:1.5; padding: 1.25rem;">
+      Are you sure you want to proceed with this action?
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="document.getElementById('confirmModal').close()">Cancel</button>
+      <button type="button" class="btn btn-rose" id="confirmModalActionBtn">Confirm</button>
+    </div>
   </dialog>
 
   <!-- Toast Notifications Container -->

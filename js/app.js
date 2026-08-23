@@ -372,19 +372,19 @@ class App {
   }
 
   resetAllData() {
-    if (confirm('Are you sure you want to clear all savings goals and history? This will start with a clean, empty workspace.')) {
+    this.showConfirm('Clear All Workspace Data', 'Are you sure you want to clear all savings goals and history? This will start with a clean, empty workspace.', () => {
       window.store.clearAllData();
-      this.showToast('All saved goals cleared.');
+      this.showToast('All saved goals cleared.', 'info');
       this.render();
-    }
+    });
   }
 
   deletePlan(planId) {
-    if (confirm('Are you sure you want to delete this savings plan? Associated log transactions will also be removed.')) {
+    this.showConfirm('Delete Goal Plan', 'Are you sure you want to delete this savings plan? Associated log entries will also be removed.', () => {
       window.store.deletePlan(planId);
-      this.showToast('Plan deleted.');
+      this.showToast('Goal deleted.', 'info');
       this.render();
-    }
+    });
   }
 
   quickAddDeposit(planId, amount) {
@@ -399,7 +399,7 @@ class App {
       note: `Quick deposit +$${amount}`
     });
 
-    this.showToast(`Added $${amount} to ${plan.title}.`);
+    this.showToast(`Added $${amount} to ${plan.title}! 🎉`, 'success');
     this.render();
   }
 
@@ -425,22 +425,22 @@ class App {
     };
 
     if (!txData.planId) {
-      this.showToast('Please select a target plan!');
+      this.showToast('Please select a target plan!', 'warning');
       return;
     }
 
     window.store.addTransaction(txData);
     document.getElementById('txModal').close();
-    this.showToast(txData.type === 'deposit' ? 'Deposit logged successfully!' : 'Withdrawal logged.');
+    this.showToast(txData.type === 'deposit' ? 'Deposit logged successfully! 🎉' : 'Withdrawal logged.', 'success');
     this.render();
   }
 
   deleteTransaction(txId) {
-    if (confirm('Delete this savings record?')) {
+    this.showConfirm('Delete Record', 'Are you sure you want to delete this savings record?', () => {
       window.store.deleteTransaction(txId);
-      this.showToast('Transaction removed.');
+      this.showToast('Record removed.', 'info');
       this.render();
-    }
+    });
   }
 
   // --- Money Requests Modals & Handlers ---
@@ -460,17 +460,17 @@ class App {
     const pin = document.getElementById('reqPinInput').value.trim();
 
     if (recipientCode.toLowerCase() === window.store.userCode.toLowerCase()) {
-      alert('You cannot send a money request to your own User Code!');
+      this.showToast('⚠️ You cannot send a money request to your own User Code!', 'warning');
       return;
     }
 
     if (!window.store.verifyPin(pin)) {
-      alert(`Incorrect Security Code/PIN! Your PIN is your User Code: ${window.store.userCode}`);
+      this.showToast(`❌ Incorrect PIN! Your PIN is your Code: ${window.store.userCode}`, 'error');
       return;
     }
 
     if (amount <= 0) {
-      alert('Please enter a valid request amount.');
+      this.showToast('⚠️ Please enter a valid request amount.', 'warning');
       return;
     }
 

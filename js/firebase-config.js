@@ -50,7 +50,11 @@ function initFirebaseAuth() {
 
 async function signInWithGoogle() {
   if (!auth) {
-    alert('Firebase is initializing or configuration is needed. Please check firebase-config.js.');
+    if (window.app) {
+      window.app.showToast('⚠️ Firebase is initializing or configuration is needed.', 'warning');
+    } else {
+      console.warn('Firebase configuration needed.');
+    }
     return;
   }
 
@@ -58,15 +62,19 @@ async function signInWithGoogle() {
     const result = await auth.signInWithPopup(googleProvider);
     const user = result.user;
     if (window.app) {
-      window.app.showToast(`Signed in as ${user.displayName || user.email}`);
+      window.app.showToast(`Signed in as ${user.displayName || user.email}`, 'success');
     }
     return user;
   } catch (error) {
     console.error('Google Sign-In Error:', error);
     if (error.code === 'auth/unauthorized-domain') {
-      alert('Unauthorized Domain: Please ensure localhost or sarwesv.github.io is added under Firebase Console > Authentication > Settings > Authorized domains.');
+      if (window.app) {
+        window.app.showToast('⚠️ Unauthorized Domain: Add domain in Firebase Console > Auth Settings.', 'warning');
+      }
     } else if (error.code !== 'auth/popup-closed-by-user') {
-      alert(`Sign-in Error: ${error.message}`);
+      if (window.app) {
+        window.app.showToast(`❌ Sign-in Error: ${error.message}`, 'error');
+      }
     }
   }
 }
