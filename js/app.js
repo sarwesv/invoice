@@ -543,50 +543,94 @@ class App {
     const goalAmount = parseFloat(document.getElementById('calcGoalTarget')?.value) || 0;
     const savedAlready = parseFloat(document.getElementById('calcAlreadySaved')?.value) || 0;
     const timeVal = parseFloat(document.getElementById('calcTimeVal')?.value) || 1;
-    const timeUnit = document.getElementById('calcTimeUnit')?.value || 'months';
+    const timeUnit = (document.getElementById('calcTimeUnit')?.value || 'months').toLowerCase();
 
     const remaining = Math.max(0, goalAmount - savedAlready);
 
-    let days = 30;
-    let weeks = 4.333;
-    let months = 1;
-
-    if (timeUnit === 'days') {
-      days = Math.max(1, timeVal);
-      weeks = days / 7;
-      months = days / 30.417;
-    } else if (timeUnit === 'weeks') {
-      weeks = Math.max(1, timeVal);
-      days = weeks * 7;
-      months = weeks / 4.333;
-    } else {
-      // months
-      months = Math.max(1, timeVal);
-      days = months * 30.417;
-      weeks = months * 4.333;
-    }
-
-    const dailyNeeded = remaining / days;
-    const weeklyNeeded = remaining / weeks;
-    const monthlyNeeded = remaining / months;
-
-    const resDaily = document.getElementById('calcDailyVal');
-    const resWeekly = document.getElementById('calcWeeklyVal');
-    const resMonthly = document.getElementById('calcMonthlyVal');
+    const resultsGrid = document.getElementById('calcResultsGrid');
     const resSummary = document.getElementById('calcSummaryMessage');
-
     const curr = window.store ? window.store.currency : '$';
 
-    if (resDaily) resDaily.textContent = `${curr}${dailyNeeded.toFixed(2)}`;
-    if (resWeekly) resWeekly.textContent = `${curr}${weeklyNeeded.toFixed(2)}`;
-    if (resMonthly) resMonthly.textContent = `${curr}${monthlyNeeded.toFixed(2)}`;
+    if (!resultsGrid || !resSummary) return;
 
-    if (resSummary) {
-      if (remaining <= 0) {
-        resSummary.innerHTML = `🎉 You already have enough saved to reach your goal!`;
+    if (remaining <= 0) {
+      resultsGrid.innerHTML = `
+        <div style="grid-column: 1 / -1;">
+          <div style="font-size:1.6rem; font-weight:800; color:var(--accent-emerald);">🎉 Goal Complete!</div>
+          <div style="font-size:0.875rem; color:var(--text-muted);">You already have enough saved to reach this goal.</div>
+        </div>
+      `;
+      resSummary.innerHTML = `🎉 You already have <strong>${curr}${savedAlready.toLocaleString()}</strong> saved for this goal!`;
+      return;
+    }
+
+    const unitSingle = timeVal === 1 ? timeUnit.replace(/s$/, '') : timeUnit;
+
+    if (timeUnit === 'days') {
+      const days = Math.max(1, timeVal);
+      const dailyNeeded = remaining / days;
+
+      resultsGrid.innerHTML = `
+        <div style="grid-column: 1 / -1;">
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">DAILY AMOUNT NEEDED</span>
+          <div style="font-size:1.8rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-emerald);">${curr}${dailyNeeded.toFixed(2)} / day</div>
+        </div>
+      `;
+
+      resSummary.innerHTML = `🎯 To reach your <strong>${curr}${remaining.toLocaleString()}</strong> goal in <strong>${timeVal} ${unitSingle}</strong>, save <strong>${curr}${dailyNeeded.toFixed(2)} each day</strong>! 🚀`;
+
+    } else if (timeUnit === 'weeks') {
+      const weeks = Math.max(1, timeVal);
+      const days = weeks * 7;
+      const weeklyNeeded = remaining / weeks;
+      const dailyNeeded = remaining / days;
+
+      resultsGrid.innerHTML = `
+        <div>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">WEEKLY NEEDED</span>
+          <div style="font-size:1.5rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-purple);">${curr}${weeklyNeeded.toFixed(2)} / wk</div>
+        </div>
+        <div>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">DAILY NEEDED</span>
+          <div style="font-size:1.5rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-emerald);">${curr}${dailyNeeded.toFixed(2)} / day</div>
+        </div>
+      `;
+
+      if (timeVal === 1) {
+        resSummary.innerHTML = `🎯 To reach your <strong>${curr}${remaining.toLocaleString()}</strong> goal in <strong>1 week</strong>, save <strong>${curr}${weeklyNeeded.toFixed(2)} this week</strong> (or <strong>${curr}${dailyNeeded.toFixed(2)} each day</strong>)! 🚀`;
       } else {
-        const unitLabel = timeVal === 1 ? timeUnit.replace(/s$/, '') : timeUnit;
-        resSummary.innerHTML = `🎯 To reach your <strong>${curr}${goalAmount.toLocaleString()}</strong> goal in <strong>${timeVal} ${unitLabel}</strong>, you need to save <strong>${curr}${dailyNeeded.toFixed(2)} a day</strong>, <strong>${curr}${weeklyNeeded.toFixed(2)} a week</strong>, or <strong>${curr}${monthlyNeeded.toFixed(2)} a month</strong>! 🚀`;
+        resSummary.innerHTML = `🎯 To reach your <strong>${curr}${remaining.toLocaleString()}</strong> goal in <strong>${timeVal} weeks</strong>, save <strong>${curr}${weeklyNeeded.toFixed(2)} each week</strong> (or <strong>${curr}${dailyNeeded.toFixed(2)} each day</strong>)! 🚀`;
+      }
+
+    } else {
+      // months
+      const months = Math.max(1, timeVal);
+      const weeks = months * 4.333;
+      const days = months * 30.417;
+
+      const monthlyNeeded = remaining / months;
+      const weeklyNeeded = remaining / weeks;
+      const dailyNeeded = remaining / days;
+
+      resultsGrid.innerHTML = `
+        <div>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">MONTHLY NEEDED</span>
+          <div style="font-size:1.4rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-amber);">${curr}${monthlyNeeded.toFixed(2)} / mo</div>
+        </div>
+        <div>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">WEEKLY NEEDED</span>
+          <div style="font-size:1.4rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-purple);">${curr}${weeklyNeeded.toFixed(2)} / wk</div>
+        </div>
+        <div>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">DAILY NEEDED</span>
+          <div style="font-size:1.4rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-emerald);">${curr}${dailyNeeded.toFixed(2)} / day</div>
+        </div>
+      `;
+
+      if (timeVal === 1) {
+        resSummary.innerHTML = `🎯 To reach your <strong>${curr}${remaining.toLocaleString()}</strong> goal in <strong>1 month</strong>, save <strong>${curr}${monthlyNeeded.toFixed(2)} this month</strong> (or <strong>${curr}${weeklyNeeded.toFixed(2)} each week</strong>)! 🚀`;
+      } else {
+        resSummary.innerHTML = `🎯 To reach your <strong>${curr}${remaining.toLocaleString()}</strong> goal in <strong>${timeVal} months</strong>, save <strong>${curr}${monthlyNeeded.toFixed(2)} each month</strong> (or <strong>${curr}${weeklyNeeded.toFixed(2)} each week</strong>)! 🚀`;
       }
     }
   }

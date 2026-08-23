@@ -356,23 +356,12 @@
             </form>
 
             <div style="margin-top:1.5rem; padding:1.25rem; background:var(--bg-tertiary); border-radius:var(--radius-md); border:1px solid var(--border-color);">
-              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:1rem; text-align:center; margin-bottom:1rem;">
-                <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">DAILY NEEDED</span>
-                  <div id="calcDailyVal" style="font-size:1.4rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-emerald);">$1.64</div>
-                </div>
-                <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">WEEKLY NEEDED</span>
-                  <div id="calcWeeklyVal" style="font-size:1.3rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-purple);">$11.54</div>
-                </div>
-                <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">MONTHLY NEEDED</span>
-                  <div id="calcMonthlyVal" style="font-size:1.3rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-amber);">$50.00</div>
-                </div>
+              <div id="calcResultsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:1rem; text-align:center; margin-bottom:1rem;">
+                <!-- Dynamically updated by app.calculateGoalPlanner() -->
               </div>
 
               <div id="calcSummaryMessage" style="padding:0.75rem 1rem; background:rgba(16,185,129,0.12); border-radius:var(--radius-sm); border:1px solid rgba(16,185,129,0.25); text-align:center; font-size:0.875rem; color:var(--text-main);">
-                🎯 To reach your <strong>$100</strong> goal in <strong>2 Months</strong>, you need to save <strong>$1.64 a day</strong> or <strong>$11.54 a week</strong>! 🚀
+                <!-- Dynamically updated by app.calculateGoalPlanner() -->
               </div>
             </div>
           </div>
