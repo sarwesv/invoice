@@ -10,6 +10,7 @@ class App {
   }
 
   init() {
+    this.startTime = Date.now();
     document.addEventListener('DOMContentLoaded', () => {
       this.bindEvents();
       this.applyTheme(window.store.theme);
@@ -21,19 +22,25 @@ class App {
 
       setTimeout(() => {
         this.hideSplashScreen();
-      }, 1400);
+      }, 3500);
     });
   }
 
   hideSplashScreen() {
-    const splash = document.getElementById('splashScreen');
-    if (splash && !this.splashHidden) {
-      this.splashHidden = true;
-      splash.classList.add('fade-out');
-      setTimeout(() => {
-        splash.style.display = 'none';
-      }, 500);
-    }
+    const elapsed = Date.now() - (this.startTime || Date.now());
+    const minDuration = 3500;
+    const delay = Math.max(0, minDuration - elapsed);
+
+    setTimeout(() => {
+      const splash = document.getElementById('splashScreen');
+      if (splash && !this.splashHidden) {
+        this.splashHidden = true;
+        splash.classList.add('fade-out');
+        setTimeout(() => {
+          splash.style.display = 'none';
+        }, 500);
+      }
+    }, delay);
   }
 
   updateUserCodeDisplay() {
