@@ -62,60 +62,15 @@ class App {
     });
   }
 
-  updateUserCapDisplay() {
-    const el = document.getElementById('userCapCountVal');
-    if (el && window.store) {
-      el.textContent = `${window.store.registeredUsersCount.toLocaleString()} / 2,000`;
-    }
-  }
-
-  test2kUserCap() {
-    if (!window.store) return;
-    window.store.setSimulatedUserCount(2000);
-    this.updateUserCapDisplay();
-    this.showToast('🧪 Simulating 2,000 (2k) signed-in users...', 'info');
-
-    setTimeout(() => {
-      const res = window.store.registerUser('new_test_user_2001');
-      if (!res.success) {
-        this.showConfirm(
-          '🔒 2k User Limit Cap Triggered (TEST SUCCESSFUL)',
-          'VaultCraft has reached its maximum capacity of 2,000 (2k) users! Additional new users are blocked from signing in.\n\nClick "Confirm" to reset capacity count back to normal.',
-          () => {
-            window.store.setSimulatedUserCount(1);
-            this.updateUserCapDisplay();
-            this.showToast('Reset user capacity back to normal (1/2,000).', 'success');
-          }
-        );
-      } else {
-        this.showToast('Failed to trigger limit.', 'error');
-      }
-    }, 500);
-  }
-
   onAuthStateChanged(user) {
     const loginScreen = document.getElementById('loginScreen');
     const appContainer = document.getElementById('appContainer');
     const authContainer = document.getElementById('authContainer');
 
     this.updateUserCodeDisplay();
-    this.updateUserCapDisplay();
     this.hideSplashScreen();
 
     if (user) {
-      const userId = user.uid || user.email;
-      if (window.store && window.store.isUserCapReached(userId)) {
-        this.showToast('🚫 User Limit Reached: VaultCraft has reached its 2,000 (2k) user limit! No more new users can sign in.', 'error');
-        if (typeof signOutUser === 'function') signOutUser();
-        if (loginScreen) loginScreen.style.display = 'flex';
-        if (appContainer) appContainer.style.display = 'none';
-        return;
-      }
-
-      if (window.store) {
-        window.store.registerUser(userId);
-      }
-
       if (loginScreen) loginScreen.style.display = 'none';
       if (appContainer) appContainer.style.display = 'grid';
 

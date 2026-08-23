@@ -49,13 +49,6 @@ function initFirebaseAuth() {
 }
 
 async function signInWithGoogle() {
-  if (window.store && window.store.isUserCapReached()) {
-    if (window.app) {
-      window.app.showToast('🚫 User Limit Reached: VaultCraft has reached its 2,000 (2k) user limit! No more new users can sign in.', 'error');
-    }
-    return;
-  }
-
   if (!auth) {
     if (window.app) {
       window.app.showToast('⚠️ Firebase is initializing or configuration is needed.', 'warning');
