@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VaultCraft - Savings Planner & Tracker</title>
-  <meta name="description" content="Simple savings goal planner and tracker with user code money requests.">
+  <title>VaultCraft - Smart Savings Planner</title>
+  <meta name="description" content="Simple, fun savings goal planner and tracker for kids and families.">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico?v=3">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=3">
@@ -35,17 +35,17 @@
         <img src="logo.svg" alt="VaultCraft Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">
       </div>
       <h1 class="login-title">VaultCraft</h1>
-      <p class="login-subtitle">Sign in to access your personal savings goals and history.</p>
+      <p class="login-subtitle">Sign in to start saving up for your favorite goals!</p>
 
       <div class="login-features">
         <div class="login-feature-item">
-          <span>🎯 Set and track target savings goals</span>
+          <span>🎯 Set goals for toys, games, gifts, or trips</span>
         </div>
         <div class="login-feature-item">
-          <span>💵 Log deposits & withdrawals easily</span>
+          <span>💵 Track your deposits and savings progress</span>
         </div>
         <div class="login-feature-item">
-          <span>📩 Send money requests via User Code (e.g. Fj38f)</span>
+          <span>📩 Ask parents or friends for money using your Code</span>
         </div>
       </div>
 
@@ -66,7 +66,7 @@
           </div>
           <div>
             <h1 class="brand-title">VaultCraft</h1>
-            <div id="userCodeBadge" style="font-size:0.75rem; color:var(--accent-emerald); font-weight:700; cursor:pointer;" onclick="app.copyUserCode()" title="Click to copy your unique user code">
+            <div id="userCodeBadge" style="font-size:0.75rem; color:var(--accent-emerald); font-weight:700; cursor:pointer;" onclick="app.copyUserCode()" title="Click to copy your unique code">
               My Code: <span id="userCodeVal">Fj38f</span> 📋
             </div>
           </div>
@@ -76,31 +76,31 @@
           <li class="nav-item">
             <button class="nav-btn active" data-tab="dashboard">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-              <span>Overview</span>
+              <span>My Money</span>
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-btn" data-tab="plans">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-              <span>Savings Goals</span>
+              <span>My Goals</span>
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-btn" data-tab="requests">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-              <span>Money Requests</span>
+              <span>Ask for Money</span>
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-btn" data-tab="ledger">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              <span>History</span>
+              <span>Activity Log</span>
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-btn" data-tab="tools">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>
-              <span>Calculator</span>
+              <span>Growth Predictor</span>
             </button>
           </li>
         </ul>
@@ -109,7 +109,7 @@
       <div class="sidebar-footer">
         <button class="quick-action-btn" onclick="app.openDepositModal('', 'deposit')">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>Add Deposit</span>
+          <span>+ Add Money</span>
         </button>
 
         <button class="theme-toggle-btn" id="themeToggleBtn">
@@ -132,19 +132,19 @@
     <!-- Mobile Bottom Navigation Bar -->
     <nav class="mobile-nav">
       <button class="mobile-nav-btn active" data-tab="dashboard">
-        <span>Overview</span>
+        <span>Money</span>
       </button>
       <button class="mobile-nav-btn" data-tab="plans">
         <span>Goals</span>
       </button>
       <button class="mobile-nav-btn" data-tab="requests">
-        <span>Requests</span>
+        <span>Ask</span>
       </button>
       <button class="mobile-nav-btn" data-tab="ledger">
-        <span>History</span>
+        <span>Activity</span>
       </button>
       <button class="mobile-nav-btn" data-tab="tools">
-        <span>Calculator</span>
+        <span>Predictor</span>
       </button>
     </nav>
 
@@ -160,11 +160,11 @@
       <div id="tab-dashboard" class="tab-content">
         <div class="header-bar">
           <div>
-            <h2 class="page-title">Savings Dashboard</h2>
-            <p class="page-subtitle">Track your progress toward your savings goals.</p>
+            <h2 class="page-title">My Money Overview</h2>
+            <p class="page-subtitle">See how much money you have saved and track your active goals!</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-secondary" onclick="app.openRequestMoneyModal()">📩 Request Money</button>
+            <button class="btn btn-secondary" onclick="app.openRequestMoneyModal()">📩 Ask for Money</button>
             <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ New Goal</button>
           </div>
         </div>
@@ -202,13 +202,21 @@
       <div id="tab-plans" class="tab-content" style="display: none;">
         <div class="header-bar">
           <div>
-            <h2 class="page-title">Savings Goals</h2>
-            <p class="page-subtitle">Manage your individual target goals and completion dates.</p>
+            <h2 class="page-title">My Savings Goals</h2>
+            <p class="page-subtitle">Set goals for things you want to save up for!</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-secondary" onclick="app.openRequestMoneyModal()">📩 Request Money</button>
+            <button class="btn btn-secondary" onclick="app.openRequestMoneyModal()">📩 Ask for Money</button>
             <button class="btn btn-primary" onclick="app.openNewPlanModal()">+ Create Goal</button>
           </div>
+        </div>
+
+        <!-- Kid Pro-Tip Banner -->
+        <div style="padding:0.85rem 1.1rem; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); border-radius:var(--radius-md); margin-bottom:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+          <span style="font-size:1.25rem;">💡</span>
+          <span style="font-size:0.875rem; color:var(--text-main); font-weight:500;">
+            <strong>Pro Tip:</strong> Create goals for things you want, like a new game, bicycle, or gift! Add small amounts regularly to watch your savings grow.
+          </span>
         </div>
 
         <div class="plans-grid" id="allPlansGrid">
@@ -220,12 +228,20 @@
       <div id="tab-requests" class="tab-content" style="display: none;">
         <div class="header-bar">
           <div>
-            <h2 class="page-title">Money Requests</h2>
-            <p class="page-subtitle">Request money from other users using their 5-character User Code (e.g. Fj38f).</p>
+            <h2 class="page-title">Ask for Money</h2>
+            <p class="page-subtitle">Request money from family or friends using their 5-character Code (e.g. Fj38f).</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-primary" onclick="app.openRequestMoneyModal()">📩 Request Money</button>
+            <button class="btn btn-primary" onclick="app.openRequestMoneyModal()">📩 Send Request</button>
           </div>
+        </div>
+
+        <!-- Kid Pro-Tip Banner -->
+        <div style="padding:0.85rem 1.1rem; background:rgba(99,102,241,0.12); border:1px solid rgba(99,102,241,0.3); border-radius:var(--radius-md); margin-bottom:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+          <span style="font-size:1.25rem;">📋</span>
+          <span style="font-size:0.875rem; color:var(--text-main); font-weight:500;">
+            <strong>How it works:</strong> Share your code (<strong id="codeBannerVal">Fj38f</strong>) with parents or friends. When sending a request, enter their code and your code to approve!
+          </span>
         </div>
 
         <div class="dashboard-grid">
@@ -255,19 +271,19 @@
       <div id="tab-ledger" class="tab-content" style="display: none;">
         <div class="header-bar">
           <div>
-            <h2 class="page-title">Transaction History</h2>
+            <h2 class="page-title">Activity Log</h2>
             <p class="page-subtitle">A simple list of every deposit and withdrawal made.</p>
           </div>
           <div class="header-actions">
             <button class="btn btn-outline" onclick="window.store.exportCSV()">Export CSV</button>
-            <button class="btn btn-primary" onclick="app.openDepositModal('', 'deposit')">+ Add Deposit</button>
+            <button class="btn btn-primary" onclick="app.openDepositModal('', 'deposit')">+ Add Money</button>
           </div>
         </div>
 
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; gap:1rem; flex-wrap:wrap;">
             <div style="display:flex; gap:0.5rem; flex:1; min-width:260px;">
-              <input type="text" id="ledgerSearch" class="form-input" placeholder="Search by note or goal name...">
+              <input type="text" id="ledgerSearch" class="form-input" placeholder="Search activity by note or goal name...">
             </div>
             <div>
               <select id="ledgerPlanFilter" class="form-select" onchange="app.renderLedger()">
@@ -300,8 +316,8 @@
       <div id="tab-tools" class="tab-content" style="display: none;">
         <div class="header-bar">
           <div>
-            <h2 class="page-title">Savings Calculator</h2>
-            <p class="page-subtitle">Calculate how fast your savings can grow over time.</p>
+            <h2 class="page-title">Savings Growth Predictor</h2>
+            <p class="page-subtitle">See how fast your money can grow over time when you save regularly!</p>
           </div>
         </div>
 
@@ -309,13 +325,13 @@
           <!-- Compound Interest Calculator -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Savings Growth Predictor</h3>
+              <h3 class="card-title">Growth Predictor</h3>
             </div>
 
             <form id="compoundForm">
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Starting Amount ($)</label>
+                  <label class="form-label">Starting Money ($)</label>
                   <input type="number" id="compoundPrincipal" class="form-input" value="100">
                 </div>
                 <div class="form-group">
@@ -342,11 +358,11 @@
                   <div id="compoundTotalVal" style="font-size:1.5rem; font-weight:800; font-family:var(--font-mono); color:var(--accent-emerald);">$0</div>
                 </div>
                 <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL CONTRIBUTIONS</span>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL SAVED</span>
                   <div id="compoundTotalDeposited" style="font-size:1.2rem; font-weight:700; font-family:var(--font-mono);">$0</div>
                 </div>
                 <div>
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">INTEREST GAINED</span>
+                  <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">EXTRA INTEREST GAINED</span>
                   <div id="compoundTotalInterest" style="font-size:1.2rem; font-weight:700; font-family:var(--font-mono); color:var(--accent-cyan);">$0</div>
                 </div>
               </div>
@@ -356,12 +372,12 @@
           <!-- Bulk Auto-Allocator Card -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Split Deposit Helper</h3>
+              <h3 class="card-title">Smart Split Helper</h3>
             </div>
             <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1rem;">
-              Enter a single deposit amount to split it across all your active savings goals based on target dates and remaining balances.
+              Enter money you received to automatically split it across all your active savings goals!
             </p>
-            <button class="btn btn-primary" style="width:100%;" onclick="app.openAutoAllocModal()">Split Deposit</button>
+            <button class="btn btn-primary" style="width:100%;" onclick="app.openAutoAllocModal()">Split Deposit Now</button>
           </div>
         </div>
       </div>
@@ -372,7 +388,7 @@
   <!-- MODAL: CREATE / EDIT SAVINGS PLAN -->
   <dialog id="planModal">
     <div class="modal-header">
-      <h3 class="modal-title" id="planModalTitle">Create Savings Goal</h3>
+      <h3 class="modal-title" id="planModalTitle">Create a Goal</h3>
       <button class="modal-close-btn" onclick="document.getElementById('planModal').close()">✕</button>
     </div>
     <form id="planForm">
@@ -380,7 +396,7 @@
         <input type="hidden" id="planIdInput">
         <div class="form-group">
           <label class="form-label">Goal Name *</label>
-          <input type="text" id="planTitleInput" class="form-input" placeholder="e.g. New Laptop, Bike, College Fund" required>
+          <input type="text" id="planTitleInput" class="form-input" placeholder="e.g. New Bicycle, Game Console, Birthday Gift" required>
         </div>
 
         <div class="form-row">
@@ -402,17 +418,17 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Target Amount ($) *</label>
-            <input type="number" id="planTargetInput" class="form-input" placeholder="100" min="1" required>
+            <label class="form-label">Goal Amount ($) *</label>
+            <input type="number" id="planTargetInput" class="form-input" placeholder="50" min="1" required>
           </div>
           <div class="form-group" id="planInitialGroup">
-            <label class="form-label">Initial Amount ($)</label>
+            <label class="form-label">Starting Money ($)</label>
             <input type="number" id="planInitialInput" class="form-input" placeholder="0">
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Target Date *</label>
+          <label class="form-label">Target Completion Date *</label>
           <input type="date" id="planTargetDateInput" class="form-input" required>
         </div>
 
@@ -442,31 +458,31 @@
   <!-- MODAL: REQUEST MONEY TO A USER CODE -->
   <dialog id="requestMoneyModal">
     <div class="modal-header">
-      <h3 class="modal-title">Request Money</h3>
+      <h3 class="modal-title">Ask for Money</h3>
       <button class="modal-close-btn" onclick="document.getElementById('requestMoneyModal').close()">✕</button>
     </div>
     <form id="requestMoneyForm">
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Recipient User Code (e.g. Fj38f) *</label>
+          <label class="form-label">Friend or Parent's Code (e.g. Fj38f) *</label>
           <input type="text" id="reqRecipientCodeInput" class="form-input" placeholder="e.g. Fj38f" required maxlength="10" style="font-family:var(--font-mono); text-transform:none;">
         </div>
 
         <div class="form-group">
           <label class="form-label">Requested Amount ($) *</label>
-          <input type="number" id="reqAmountInput" class="form-input" placeholder="25.00" min="0.01" step="0.01" required>
+          <input type="number" id="reqAmountInput" class="form-input" placeholder="10.00" min="0.01" step="0.01" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Reason / Note *</label>
-          <input type="text" id="reqNoteInput" class="form-input" placeholder="e.g. Dinner split, Movie ticket" required>
+          <label class="form-label">Reason *</label>
+          <input type="text" id="reqNoteInput" class="form-input" placeholder="e.g. Chore reward, Allowance, Lunch" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Your Security Code / PIN *</label>
+          <label class="form-label">Your Code (to approve) *</label>
           <input type="text" id="reqPinInput" class="form-input" placeholder="e.g. Fj38f" required style="font-family:var(--font-mono);">
           <small style="display:block; margin-top:0.3rem; color:var(--text-muted);">
-            Type your 5-character User Code to authorize this money request.
+            Type your 5-character User Code to approve sending this request.
           </small>
         </div>
       </div>
@@ -480,13 +496,13 @@
   <!-- MODAL: LOG SAVINGS / WITHDRAWAL -->
   <dialog id="txModal">
     <div class="modal-header">
-      <h3 class="modal-title">Log Transaction</h3>
+      <h3 class="modal-title">Log Money Activity</h3>
       <button class="modal-close-btn" onclick="document.getElementById('txModal').close()">✕</button>
     </div>
     <form id="txForm">
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Goal *</label>
+          <label class="form-label">Select Goal *</label>
           <select id="txPlanSelect" class="form-select" required>
             <!-- Options populated dynamically -->
           </select>
@@ -494,10 +510,10 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Type</label>
+            <label class="form-label">Action</label>
             <select id="txTypeSelect" class="form-select">
-              <option value="deposit">+ Deposit</option>
-              <option value="withdrawal">- Withdrawal</option>
+              <option value="deposit">+ Add Money</option>
+              <option value="withdrawal">- Take Out</option>
             </select>
           </div>
           <div class="form-group">
@@ -510,10 +526,10 @@
         <div style="margin-bottom: 1rem;">
           <label class="form-label">Quick Amounts:</label>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button type="button" class="chip-btn" onclick="document.getElementById('txAmountInput').value = 1">+$1</button>
             <button type="button" class="chip-btn" onclick="document.getElementById('txAmountInput').value = 5">+$5</button>
             <button type="button" class="chip-btn" onclick="document.getElementById('txAmountInput').value = 10">+$10</button>
             <button type="button" class="chip-btn" onclick="document.getElementById('txAmountInput').value = 20">+$20</button>
-            <button type="button" class="chip-btn" onclick="document.getElementById('txAmountInput').value = 50">+$50</button>
           </div>
         </div>
 
@@ -523,13 +539,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Note</label>
-          <input type="text" id="txNoteInput" class="form-input" placeholder="e.g. Allowance, Gift, Weekly savings">
+          <label class="form-label">Note / Description</label>
+          <input type="text" id="txNoteInput" class="form-input" placeholder="e.g. Allowance, Chores, Gift">
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="document.getElementById('txModal').close()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Transaction</button>
+        <button type="submit" class="btn btn-primary">Save Activity</button>
       </div>
     </form>
   </dialog>
@@ -537,17 +553,17 @@
   <!-- MODAL: AUTO ALLOCATOR -->
   <dialog id="allocModal">
     <div class="modal-header">
-      <h3 class="modal-title">Split Deposit</h3>
+      <h3 class="modal-title">Smart Split Deposit</h3>
       <button class="modal-close-btn" onclick="document.getElementById('allocModal').close()">✕</button>
     </div>
     <form id="allocForm">
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Amount to Split ($)</label>
+          <label class="form-label">Total Amount to Split ($)</label>
           <input type="number" id="allocAmountInput" class="form-input" value="50" oninput="app.calculateAutoAlloc()">
         </div>
 
-        <label class="form-label">Proposed Distribution:</label>
+        <label class="form-label">Suggested Goal Split:</label>
         <div id="allocResultsContainer" style="margin-top:0.5rem;">
           <!-- Dynamically computed -->
         </div>

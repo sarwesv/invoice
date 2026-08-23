@@ -45,8 +45,10 @@ class App {
 
   updateUserCodeDisplay() {
     const el = document.getElementById('userCodeVal');
-    if (el && window.store) {
-      el.textContent = window.store.userCode;
+    const bannerEl = document.getElementById('codeBannerVal');
+    if (window.store) {
+      if (el) el.textContent = window.store.userCode;
+      if (bannerEl) bannerEl.textContent = window.store.userCode;
     }
   }
 

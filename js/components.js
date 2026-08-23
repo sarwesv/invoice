@@ -14,19 +14,19 @@ class UIComponents {
 
     const velocityDiff = currentMonthSaved - lastMonthSaved;
     const velocityBadge = velocityDiff >= 0 
-      ? `<span class="badge-positive">+${store.currency}${velocityDiff.toLocaleString()} this month</span>`
+      ? `<span class="badge-positive">+${store.currency}${velocityDiff.toLocaleString()} saved this month 🎉</span>`
       : `<span class="badge-negative">-${store.currency}${Math.abs(velocityDiff).toLocaleString()} vs last month</span>`;
 
     return `
       <div class="summary-card" style="--card-accent: var(--grad-primary);">
         <div class="summary-card-header">
-          <span>TOTAL SAVINGS</span>
+          <span>TOTAL SAVED</span>
           <div class="summary-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
           </div>
         </div>
         <div class="summary-value">${store.currency}${totalSavings.toLocaleString()}</div>
-        <div class="summary-subtext">Target: ${store.currency}${totalTarget.toLocaleString()}</div>
+        <div class="summary-subtext">Total Goal: ${store.currency}${totalTarget.toLocaleString()}</div>
       </div>
 
       <div class="summary-card" style="--card-accent: var(--grad-accent);">
@@ -59,12 +59,16 @@ class UIComponents {
     const currency = store.currency;
 
     let statusBadge = '';
-    if (analytics.status === 'completed') {
-      statusBadge = `<span class="badge-tag" style="background: rgba(6,182,212,0.15); color: var(--accent-cyan);">COMPLETED</span>`;
-    } else if (analytics.status === 'behind') {
-      statusBadge = `<span class="badge-tag" style="background: rgba(245,158,11,0.15); color: var(--accent-amber);">BEHIND</span>`;
+    if (analytics.percent >= 100) {
+      statusBadge = `<span class="badge-tag" style="background: rgba(6,182,212,0.18); color: var(--accent-cyan); font-weight:800;">🎉 GOAL REACHED!</span>`;
+    } else if (analytics.percent >= 75) {
+      statusBadge = `<span class="badge-tag" style="background: rgba(16,185,129,0.15); color: var(--accent-emerald);">🔥 Almost There!</span>`;
+    } else if (analytics.percent >= 50) {
+      statusBadge = `<span class="badge-tag" style="background: rgba(99,102,241,0.15); color: #818cf8;">🏃 Halfway!</span>`;
+    } else if (plan.currentAmount > 0) {
+      statusBadge = `<span class="badge-tag" style="background: rgba(16,185,129,0.12); color: var(--accent-emerald);">🌱 Saving Up!</span>`;
     } else {
-      statusBadge = `<span class="badge-tag" style="background: rgba(16,185,129,0.15); color: var(--accent-emerald);">ON TRACK</span>`;
+      statusBadge = `<span class="badge-tag" style="background: rgba(245,158,11,0.15); color: var(--accent-amber);">🚀 Ready to Start!</span>`;
     }
 
     return `
@@ -85,12 +89,12 @@ class UIComponents {
 
           <div class="plan-meta">
             <h3 class="plan-title">${plan.title}</h3>
-            <span class="plan-category">${plan.category} • Target Date: ${plan.targetDate}</span>
+            <span class="plan-category">Target Date: ${plan.targetDate}</span>
           </div>
 
           <div class="plan-progress-info">
             <span class="plan-current-val">${currency}${plan.currentAmount.toLocaleString()}</span>
-            <span class="plan-target-val">of ${currency}${plan.targetAmount.toLocaleString()}</span>
+            <span class="plan-target-val">saved of ${currency}${plan.targetAmount.toLocaleString()}</span>
           </div>
 
           <div class="progress-bar-bg">
@@ -100,11 +104,12 @@ class UIComponents {
 
         <div>
           <div class="plan-stats-footer" style="margin-bottom:0.75rem;">
-            <span>${analytics.percent.toFixed(0)}% reached</span>
-            <span>${analytics.diffDays} days left</span>
+            <span><strong>${analytics.percent.toFixed(0)}%</strong> reached</span>
+            <span><strong>${analytics.diffDays}</strong> days left</span>
           </div>
 
-          <div style="display:flex; gap:0.4rem; margin-bottom:0.75rem;">
+          <div style="display:flex; gap:0.35rem; margin-bottom:0.75rem;">
+            <button class="chip-btn" style="flex:1; text-align:center; padding:0.35rem 0;" onclick="app.quickAddDeposit('${plan.id}', 1)">+$1</button>
             <button class="chip-btn" style="flex:1; text-align:center; padding:0.35rem 0;" onclick="app.quickAddDeposit('${plan.id}', 5)">+$5</button>
             <button class="chip-btn" style="flex:1; text-align:center; padding:0.35rem 0;" onclick="app.quickAddDeposit('${plan.id}', 10)">+$10</button>
             <button class="chip-btn" style="flex:1; text-align:center; padding:0.35rem 0;" onclick="app.quickAddDeposit('${plan.id}', 20)">+$20</button>
@@ -112,10 +117,10 @@ class UIComponents {
 
           <div class="plan-card-footer">
             <button class="btn btn-primary btn-sm" onclick="app.openDepositModal('${plan.id}', 'deposit')">
-              + Deposit
+              + Add Money
             </button>
             <button class="btn btn-outline btn-sm" onclick="app.openDepositModal('${plan.id}', 'withdrawal')">
-              Withdraw
+              - Take Out
             </button>
           </div>
         </div>
@@ -129,7 +134,7 @@ class UIComponents {
       return `
         <tr>
           <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
-            No transactions recorded yet. Click "+ Add Deposit" to add an entry.
+            No money activity recorded yet. Click "+ Add Money" to add your first deposit!
           </td>
         </tr>
       `;
@@ -139,20 +144,20 @@ class UIComponents {
       const plan = store.getPlanById(tx.planId);
       const isDeposit = tx.type === 'deposit';
       const typeBadge = isDeposit
-        ? `<span class="tx-badge" style="background: rgba(16,185,129,0.15); color: var(--accent-emerald);">Deposit</span>`
-        : `<span class="tx-badge" style="background: rgba(244,63,94,0.15); color: var(--accent-rose);">Withdrawal</span>`;
+        ? `<span class="tx-badge" style="background: rgba(16,185,129,0.15); color: var(--accent-emerald);">Added Money</span>`
+        : `<span class="tx-badge" style="background: rgba(244,63,94,0.15); color: var(--accent-rose);">Took Out</span>`;
 
       return `
         <tr>
           <td>${tx.date}</td>
-          <td><strong>${plan ? plan.icon + ' ' + plan.title : 'General'}</strong></td>
+          <td><strong>${plan ? plan.icon + ' ' + plan.title : 'General Goal'}</strong></td>
           <td>${typeBadge}</td>
           <td class="tx-amount ${isDeposit ? 'tx-deposit' : 'tx-withdrawal'}">
             ${isDeposit ? '+' : '-'}${store.currency}${tx.amount.toLocaleString()}
           </td>
           <td style="color: var(--text-muted); font-size: 0.825rem;">${tx.note || '-'}</td>
           <td style="text-align: right;">
-            <button class="btn btn-outline btn-sm btn-icon-only" onclick="app.deleteTransaction('${tx.id}')" title="Delete Record">
+            <button class="btn btn-outline btn-sm btn-icon-only" onclick="app.deleteTransaction('${tx.id}')" title="Delete Entry">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </td>
@@ -190,14 +195,14 @@ class UIComponents {
           </div>
 
           <div style="font-size:0.825rem; color:var(--text-muted); margin-bottom:0.6rem;">
-            Note: "${req.note}" • <span style="font-size:0.75rem;">${req.createdAt}</span>
+            Reason: "${req.note}" • <span style="font-size:0.75rem;">${req.createdAt}</span>
           </div>
 
           <div style="display:flex; justify-content:space-between; align-items:center;">
             ${statusBadge}
             ${req.status === 'pending' ? `
               <div style="display:flex; gap:0.4rem;">
-                <button class="btn btn-primary btn-sm" onclick="app.updateMoneyRequestStatus('${req.id}', 'approved')">Approve</button>
+                <button class="btn btn-primary btn-sm" onclick="app.updateMoneyRequestStatus('${req.id}', 'approved')">Approve Request</button>
                 <button class="btn btn-outline btn-sm" onclick="app.updateMoneyRequestStatus('${req.id}', 'declined')">Decline</button>
               </div>
             ` : ''}
@@ -235,7 +240,7 @@ class UIComponents {
           </div>
 
           <div style="font-size:0.825rem; color:var(--text-muted); margin-bottom:0.6rem;">
-            Note: "${req.note}" • <span style="font-size:0.75rem;">${req.createdAt}</span>
+            Reason: "${req.note}" • <span style="font-size:0.75rem;">${req.createdAt}</span>
           </div>
 
           <div style="display:flex; justify-content:space-between; align-items:center;">
