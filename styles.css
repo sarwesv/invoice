@@ -135,6 +135,8 @@ body {
   justify-content: center;
   color: #fff;
   box-shadow: var(--shadow-glow);
+  overflow: hidden;
+  padding: 4px;
 }
 
 .brand-icon svg {
@@ -1027,6 +1029,8 @@ dialog::backdrop {
   color: #fff;
   margin: 0 auto 1.25rem auto;
   box-shadow: var(--shadow-glow);
+  overflow: hidden;
+  padding: 6px;
 }
 
 .login-title {
@@ -1126,6 +1130,8 @@ dialog::backdrop {
   margin-bottom: 1.25rem;
   box-shadow: 0 0 45px rgba(16, 185, 129, 0.45);
   animation: splashLogoFloat 2.2s ease-in-out infinite;
+  overflow: hidden;
+  padding: 8px;
 }
 
 .splash-title {
