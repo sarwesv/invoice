@@ -635,14 +635,56 @@ class App {
     }
   }
 
-  showToast(message) {
+  showConfirm(title, message, onConfirmCallback) {
+    const modal = document.getElementById('confirmModal');
+    const titleEl = document.getElementById('confirmModalTitle');
+    const bodyEl = document.getElementById('confirmModalBody');
+    const actionBtn = document.getElementById('confirmModalActionBtn');
+
+    if (!modal) {
+      if (window.confirm(message)) onConfirmCallback();
+      return;
+    }
+
+    if (titleEl) titleEl.textContent = title || 'Confirm Action';
+    if (bodyEl) bodyEl.textContent = message;
+
+    const newBtn = actionBtn.cloneNode(true);
+    actionBtn.parentNode.replaceChild(newBtn, actionBtn);
+
+    newBtn.addEventListener('click', () => {
+      modal.close();
+      if (typeof onConfirmCallback === 'function') {
+        onConfirmCallback();
+      }
+    });
+
+    modal.showModal();
+  }
+
+  showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
 
     const toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = `toast toast-${type}`;
+
+    let strokeColor = '#10b981';
+    let iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+    if (type === 'warning') {
+      strokeColor = '#f59e0b';
+      iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+    } else if (type === 'error') {
+      strokeColor = '#f43f5e';
+      iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+    } else if (type === 'info') {
+      strokeColor = '#6366f1';
+      iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+    }
+
     toast.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      ${iconSvg}
       <span>${message}</span>
     `;
 
@@ -651,8 +693,17 @@ class App {
       toast.style.opacity = '0';
       toast.style.transform = 'translateX(50px)';
       setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, 3500);
   }
 }
 
 window.app = new App();
+
+// Safe fallback override for window.alert
+window.alert = function(msg) {
+  if (window.app && typeof window.app.showToast === 'function') {
+    window.app.showToast(msg, 'warning');
+  } else {
+    console.warn('Alert:', msg);
+  }
+};
