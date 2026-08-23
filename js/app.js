@@ -62,6 +62,16 @@ class App {
     });
   }
 
+  toggleAccountNamePrivacy() {
+    const current = localStorage.getItem('vaultcraft_hide_account_name') === 'true';
+    const nextState = !current;
+    localStorage.setItem('vaultcraft_hide_account_name', nextState ? 'true' : 'false');
+    this.showToast(nextState ? 'Account name hidden (Privacy Mode ON) 🙈' : 'Account name visible 👁️', 'info');
+    if (window.currentUser) {
+      this.onAuthStateChanged(window.currentUser);
+    }
+  }
+
   onAuthStateChanged(user) {
     const loginScreen = document.getElementById('loginScreen');
     const appContainer = document.getElementById('appContainer');
@@ -75,15 +85,25 @@ class App {
       if (appContainer) appContainer.style.display = 'grid';
 
       if (authContainer) {
-        const photoURL = user.photoURL || 'https://via.placeholder.com/32';
-        const name = user.displayName || user.email || 'User';
+        const isPrivacyOn = localStorage.getItem('vaultcraft_hide_account_name') === 'true';
+        const photoURL = isPrivacyOn 
+          ? 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%2310b981%22/><text x=%2250%22 y=%2262%22 font-size=%2245%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>🔒</text></svg>' 
+          : (user.photoURL || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%2310b981%22/></svg>');
+        const name = isPrivacyOn ? 'Account Hidden 🔒' : (user.displayName || user.email || 'User');
+        const subtext = isPrivacyOn ? 'Privacy Mode ON' : 'Signed in';
+        const toggleTitle = isPrivacyOn ? 'Show Account Name' : 'Hide Account Name';
+        const toggleIcon = isPrivacyOn ? '👁️' : '🙈';
+
         authContainer.innerHTML = `
           <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem; padding:0.5rem; background:var(--bg-tertiary); border-radius:var(--radius-md); border:1px solid var(--border-color);">
-            <img src="${photoURL}" alt="${name}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%2310b981%22/></svg>'">
+            <img src="${photoURL}" alt="${name}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
             <div style="flex:1; overflow:hidden;">
               <div style="font-size:0.8rem; font-weight:700; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${name}</div>
-              <div style="font-size:0.68rem; color:var(--text-muted);">Signed in</div>
+              <div style="font-size:0.68rem; color:var(--text-muted);">${subtext}</div>
             </div>
+            <button class="btn btn-outline btn-sm btn-icon-only" onclick="app.toggleAccountNamePrivacy()" title="${toggleTitle}">
+              ${toggleIcon}
+            </button>
             <button class="btn btn-outline btn-sm btn-icon-only" onclick="signOutUser()" title="Sign Out">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             </button>

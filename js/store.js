@@ -89,7 +89,9 @@ class Store {
     const newRequest = {
       id,
       senderCode: this.userCode,
-      senderName: window.currentUser ? (window.currentUser.displayName || window.currentUser.email) : 'User',
+      senderName: (window.currentUser && localStorage.getItem('vaultcraft_hide_account_name') !== 'true') 
+        ? (window.currentUser.displayName || window.currentUser.email) 
+        : 'Friend',
       recipientCode: recipientCode.trim(),
       amount: parseFloat(amount) || 0,
       goalId,
