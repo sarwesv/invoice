@@ -664,15 +664,6 @@ class App {
     const bodyEl = document.getElementById('confirmModalBody');
     const actionBtn = document.getElementById('confirmModalActionBtn');
 
-    const closeModal = () => {
-      if (!modal) return;
-      try {
-        if (modal.hasAttribute('open')) modal.close();
-      } catch (e) {
-        modal.removeAttribute('open');
-      }
-    };
-
     if (!modal || typeof modal.showModal !== 'function') {
       if (window.confirm(`${title ? title + ':\n' : ''}${message}`)) {
         if (typeof onConfirmCallback === 'function') onConfirmCallback();
@@ -683,33 +674,36 @@ class App {
     if (titleEl) titleEl.textContent = title || 'Confirm Action';
     if (bodyEl) bodyEl.textContent = message;
 
+    const closeModal = () => {
+      try {
+        if (modal.open) modal.close();
+      } catch (e) {
+        modal.removeAttribute('open');
+      }
+    };
+
     const newBtn = actionBtn.cloneNode(true);
     actionBtn.parentNode.replaceChild(newBtn, actionBtn);
 
     newBtn.onclick = (e) => {
       e.preventDefault();
+      e.stopPropagation();
       closeModal();
-      setTimeout(() => {
-        if (typeof onConfirmCallback === 'function') {
-          onConfirmCallback();
-        }
-      }, 30);
+      if (typeof onConfirmCallback === 'function') {
+        onConfirmCallback();
+      }
     };
 
     modal.onclick = (e) => {
-      const rect = modal.getBoundingClientRect();
-      const isInside = (
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom
-      );
-      if (!isInside) {
+      if (e.target === modal) {
         closeModal();
       }
     };
 
     try {
+      if (modal.open) {
+        modal.close();
+      }
       modal.showModal();
     } catch(err) {
       if (window.confirm(`${title ? title + ':\n' : ''}${message}`)) {

@@ -321,6 +321,7 @@ class Store {
   deletePlan(id) {
     this.plans = this.plans.filter(p => p.id !== id);
     this.transactions = this.transactions.filter(t => t.planId !== id);
+    this.reconcilePlanBalances();
     this.saveState();
   }
 
@@ -342,6 +343,7 @@ class Store {
     };
 
     this.transactions.unshift(newTx);
+    this.reconcilePlanBalances();
 
     if (autoSave) this.saveState();
     return newTx;
@@ -351,6 +353,7 @@ class Store {
     const txIndex = this.transactions.findIndex(t => t.id === id);
     if (txIndex !== -1) {
       this.transactions.splice(txIndex, 1);
+      this.reconcilePlanBalances();
       this.saveState();
     }
   }
