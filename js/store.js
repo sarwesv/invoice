@@ -20,6 +20,7 @@ class Store {
     this.loadState();
     this.loadUserProfile();
     this.loadMoneyRequests();
+    this.initFirestoreSync();
   }
 
   generateUserCode() {
@@ -84,8 +85,43 @@ class Store {
     }
   }
 
+  initFirestoreSync() {
+    if (!window.db || this.firestoreSubscribed) return;
+    try {
+      this.firestoreSubscribed = true;
+      window.db.collection('moneyRequests').onSnapshot((snapshot) => {
+        const remoteRequests = [];
+        snapshot.forEach((doc) => {
+          remoteRequests.push(doc.data());
+        });
+        
+        if (remoteRequests.length > 0) {
+          // Merge remote requests with local requests sorted by timestamp/createdAt
+          const requestMap = new Map();
+          this.moneyRequests.forEach(r => requestMap.set(r.id, r));
+          remoteRequests.forEach(r => requestMap.set(r.id, r));
+          
+          this.moneyRequests = Array.from(requestMap.values()).sort((a, b) => {
+            return (b.timestamp || 0) - (a.timestamp || 0);
+          });
+
+          this.saveMoneyRequests();
+
+          if (window.app && typeof window.app.renderRequests === 'function') {
+            window.app.renderRequests();
+          }
+        }
+      }, (error) => {
+        console.warn('Firestore moneyRequests sync info:', error.message);
+      });
+    } catch (e) {
+      console.error('Error initializing Firestore sync:', e);
+    }
+  }
+
   createMoneyRequest(recipientCode, amount, goalId = '', note = '') {
-    const id = 'req_' + Date.now();
+    const timestamp = Date.now();
+    const id = 'req_' + timestamp;
     const newRequest = {
       id,
       senderCode: this.userCode,
@@ -97,11 +133,19 @@ class Store {
       goalId,
       note: note.trim() || 'Money Request',
       status: 'pending',
+      timestamp,
       createdAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
     this.moneyRequests.unshift(newRequest);
     this.saveMoneyRequests();
+
+    if (window.db) {
+      window.db.collection('moneyRequests').doc(id).set(newRequest).catch((err) => {
+        console.error('Error writing money request to Firestore:', err);
+      });
+    }
+
     return newRequest;
   }
 
@@ -118,6 +162,13 @@ class Store {
     if (req) {
       req.status = status;
       this.saveMoneyRequests();
+
+      if (window.db) {
+        window.db.collection('moneyRequests').doc(requestId).update({ status }).catch((err) => {
+          console.error('Error updating money request status in Firestore:', err);
+        });
+      }
+
       return req;
     }
     return null;

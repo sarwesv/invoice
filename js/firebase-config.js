@@ -14,6 +14,7 @@ const firebaseConfig = {
 
 let auth = null;
 let googleProvider = null;
+let db = null;
 
 function initFirebaseAuth() {
   if (typeof firebase === 'undefined') {
@@ -36,15 +37,30 @@ function initFirebaseAuth() {
     googleProvider.addScope('profile');
     googleProvider.addScope('email');
 
+    if (typeof firebase.firestore === 'function') {
+      try {
+        db = firebase.firestore();
+        window.db = db;
+        if (window.store && typeof window.store.initFirestoreSync === 'function') {
+          window.store.initFirestoreSync();
+        }
+      } catch (e) {
+        console.error('Firestore initialization error:', e);
+      }
+    }
+
     // Observe auth state changes
     auth.onAuthStateChanged((user) => {
       window.currentUser = user;
+      if (window.store && typeof window.store.initFirestoreSync === 'function') {
+        window.store.initFirestoreSync();
+      }
       if (window.app && typeof window.app.onAuthStateChanged === 'function') {
         window.app.onAuthStateChanged(user);
       }
     });
   } catch (e) {
-    console.error('Error setting up Firebase Auth:', e);
+    console.error('Error setting up Firebase Auth/Firestore:', e);
   }
 }
 
