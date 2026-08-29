@@ -59,9 +59,21 @@ class Store {
     }
   }
 
+  setUserCode(newCode) {
+    if (!newCode || !newCode.trim()) return false;
+    this.userCode = newCode.trim();
+    this.userPin = this.userCode;
+    this.saveUserProfile();
+    if (window.app && typeof window.app.updateUserCodeDisplay === 'function') {
+      window.app.updateUserCodeDisplay();
+      window.app.renderRequests();
+    }
+    return true;
+  }
+
   verifyPin(pin) {
     if (!pin) return false;
-    return pin.trim() === this.userCode;
+    return pin.trim().toLowerCase() === (this.userCode || '').trim().toLowerCase();
   }
 
   loadMoneyRequests() {
@@ -95,21 +107,19 @@ class Store {
           remoteRequests.push(doc.data());
         });
         
-        if (remoteRequests.length > 0) {
-          // Merge remote requests with local requests sorted by timestamp/createdAt
-          const requestMap = new Map();
-          this.moneyRequests.forEach(r => requestMap.set(r.id, r));
-          remoteRequests.forEach(r => requestMap.set(r.id, r));
-          
-          this.moneyRequests = Array.from(requestMap.values()).sort((a, b) => {
-            return (b.timestamp || 0) - (a.timestamp || 0);
-          });
+        // Merge remote requests with local requests sorted by timestamp/createdAt
+        const requestMap = new Map();
+        (this.moneyRequests || []).forEach(r => { if (r && r.id) requestMap.set(r.id, r); });
+        remoteRequests.forEach(r => { if (r && r.id) requestMap.set(r.id, r); });
+        
+        this.moneyRequests = Array.from(requestMap.values()).sort((a, b) => {
+          return (b.timestamp || 0) - (a.timestamp || 0);
+        });
 
-          this.saveMoneyRequests();
+        this.saveMoneyRequests();
 
-          if (window.app && typeof window.app.renderRequests === 'function') {
-            window.app.renderRequests();
-          }
+        if (window.app && typeof window.app.renderRequests === 'function') {
+          window.app.renderRequests();
         }
       }, (error) => {
         console.warn('Firestore moneyRequests sync info:', error.message);
@@ -124,7 +134,7 @@ class Store {
     const id = 'req_' + timestamp;
     const newRequest = {
       id,
-      senderCode: this.userCode,
+      senderCode: (this.userCode || '').trim(),
       senderName: (window.currentUser && localStorage.getItem('vaultcraft_hide_account_name') !== 'true') 
         ? (window.currentUser.displayName || window.currentUser.email) 
         : 'Friend',
@@ -150,11 +160,15 @@ class Store {
   }
 
   getIncomingRequests() {
-    return this.moneyRequests.filter(r => r.recipientCode === this.userCode || r.recipientCode.toLowerCase() === this.userCode.toLowerCase());
+    const myCode = (this.userCode || '').trim().toLowerCase();
+    if (!myCode) return [];
+    return this.moneyRequests.filter(r => (r.recipientCode || '').trim().toLowerCase() === myCode);
   }
 
   getOutgoingRequests() {
-    return this.moneyRequests.filter(r => r.senderCode === this.userCode || r.senderCode.toLowerCase() === this.userCode.toLowerCase());
+    const myCode = (this.userCode || '').trim().toLowerCase();
+    if (!myCode) return [];
+    return this.moneyRequests.filter(r => (r.senderCode || '').trim().toLowerCase() === myCode);
   }
 
   updateRequestStatus(requestId, status) {

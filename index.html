@@ -66,8 +66,9 @@
           </div>
           <div>
             <h1 class="brand-title">VaultCraft</h1>
-            <div id="userCodeBadge" style="font-size:0.75rem; color:var(--accent-emerald); font-weight:700; cursor:pointer;" onclick="app.copyUserCode()" title="Click to copy your unique code">
-              My Code: <span id="userCodeVal">Fj38f</span> 📋
+            <div id="userCodeBadge" style="font-size:0.75rem; color:var(--accent-emerald); font-weight:700; display:flex; align-items:center; gap:0.4rem;">
+              <span onclick="app.copyUserCode()" style="cursor:pointer;" title="Click to copy your unique code">My Code: <span id="userCodeVal">Fj38f</span> 📋</span>
+              <button class="btn btn-outline btn-sm" onclick="app.editUserCode()" style="padding:0.1rem 0.4rem; font-size:0.7rem; border-radius:4px; height:auto;">✏️ Edit</button>
             </div>
           </div>
         </div>

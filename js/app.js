@@ -62,6 +62,19 @@ class App {
     });
   }
 
+  editUserCode() {
+    if (!window.store) return;
+    const currentCode = window.store.userCode;
+    const input = prompt('Set your custom User Code (e.g. Fj38f):', currentCode);
+    if (input !== null && input.trim() !== '') {
+      const clean = input.trim();
+      window.store.setUserCode(clean);
+      this.showToast(`User Code updated to: ${clean}`, 'success');
+      this.updateUserCodeDisplay();
+      this.renderRequests();
+    }
+  }
+
   toggleAccountNamePrivacy() {
     const current = localStorage.getItem('vaultcraft_hide_account_name') === 'true';
     const nextState = !current;
