@@ -1,0 +1,8 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /moneyRequests/{requestId} {
+      allow read, create, update, delete: if true;
+    }
+  }
+}
