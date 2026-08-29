@@ -46,9 +46,18 @@ class App {
   updateUserCodeDisplay() {
     const el = document.getElementById('userCodeVal');
     const bannerEl = document.getElementById('codeBannerVal');
+    const headerAvatar = document.getElementById('headerUserAvatar');
+    const headerName = document.getElementById('headerUserName');
+
     if (window.store) {
       if (el) el.textContent = window.store.userCode;
       if (bannerEl) bannerEl.textContent = window.store.userCode;
+
+      const displayName = window.store.getUserDisplayName();
+      const photoURL = window.store.getUserPhoto();
+
+      if (headerAvatar) headerAvatar.src = photoURL;
+      if (headerName) headerName.textContent = displayName;
     }
   }
 
@@ -75,6 +84,63 @@ class App {
     }
   }
 
+  openProfileModal() {
+    if (!window.store) return;
+    const nameInput = document.getElementById('profileNameInput');
+    const avatarPreview = document.getElementById('profileAvatarPreview');
+    const photoInput = document.getElementById('profilePhotoInput');
+
+    if (nameInput) nameInput.value = window.store.userName || (window.currentUser ? (window.currentUser.displayName || '') : '');
+    if (avatarPreview) avatarPreview.src = window.store.getUserPhoto();
+    if (photoInput) photoInput.value = '';
+
+    const modal = document.getElementById('profileModal');
+    if (modal) modal.showModal();
+  }
+
+  previewProfilePhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const preview = document.getElementById('profileAvatarPreview');
+      if (preview) preview.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  handleProfileSubmit(e) {
+    e.preventDefault();
+    const nameInput = document.getElementById('profileNameInput');
+    const photoInput = document.getElementById('profilePhotoInput');
+
+    const newName = nameInput ? nameInput.value.trim() : '';
+
+    const finalize = (photoData) => {
+      window.store.updateProfile(newName, photoData);
+      const modal = document.getElementById('profileModal');
+      if (modal) modal.close();
+      this.showToast('Profile updated! ✨', 'success');
+      if (window.currentUser) {
+        this.onAuthStateChanged(window.currentUser);
+      } else {
+        this.updateUserCodeDisplay();
+        this.renderRequests();
+      }
+    };
+
+    if (photoInput && photoInput.files && photoInput.files[0]) {
+      const file = photoInput.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        finalize(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      finalize(window.store.userPhoto);
+    }
+  }
+
   toggleAccountNamePrivacy() {
     const current = localStorage.getItem('vaultcraft_hide_account_name') === 'true';
     const nextState = !current;
@@ -98,16 +164,17 @@ class App {
       if (appContainer) appContainer.style.display = 'grid';
 
       if (authContainer) {
-        const photoURL = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%2310b981%22/><text x=%2250%22 y=%2262%22 font-size=%2245%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>👤</text></svg>';
+        const name = window.store.getUserDisplayName();
+        const photoURL = window.store.getUserPhoto();
 
         authContainer.innerHTML = `
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem; padding:0.5rem; background:var(--bg-tertiary); border-radius:var(--radius-md); border:1px solid var(--border-color);">
-            <img src="${photoURL}" alt="Account" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+          <div onclick="app.openProfileModal()" style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem; padding:0.5rem; background:var(--bg-tertiary); border-radius:var(--radius-md); border:1px solid var(--border-color); cursor:pointer;" title="Click to view & edit profile">
+            <img src="${photoURL}" alt="${name}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1.5px solid var(--accent-emerald);">
             <div style="flex:1; overflow:hidden;">
-              <div style="font-size:0.8rem; font-weight:700; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">Account</div>
-              <div style="font-size:0.68rem; color:var(--accent-emerald); font-weight:600;">Signed In</div>
+              <div style="font-size:0.8rem; font-weight:700; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:var(--text-main);">${name}</div>
+              <div style="font-size:0.68rem; color:var(--accent-emerald); font-weight:600;">Signed In ✏️</div>
             </div>
-            <button class="btn btn-outline btn-sm btn-icon-only" onclick="signOutUser()" title="Sign Out">
+            <button class="btn btn-outline btn-sm btn-icon-only" onclick="event.stopPropagation(); signOutUser()" title="Sign Out">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             </button>
           </div>

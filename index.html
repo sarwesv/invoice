@@ -68,7 +68,12 @@
             <h1 class="brand-title">VaultCraft</h1>
             <div id="userCodeBadge" style="font-size:0.75rem; color:var(--accent-emerald); font-weight:700; display:flex; align-items:center; gap:0.4rem;">
               <span onclick="app.copyUserCode()" style="cursor:pointer;" title="Click to copy your unique code">My Code: <span id="userCodeVal">Fj38f</span> 📋</span>
-              <button class="btn btn-outline btn-sm" onclick="app.editUserCode()" style="padding:0.1rem 0.4rem; font-size:0.7rem; border-radius:4px; height:auto;">✏️ Edit</button>
+              <button class="btn btn-outline btn-sm" onclick="app.editUserCode()" style="padding:0.1rem 0.4rem; font-size:0.7rem; border-radius:4px; height:auto;">✏️ Edit Code</button>
+            </div>
+            <div onclick="app.openProfileModal()" style="display:flex; align-items:center; gap:0.45rem; margin-top:0.35rem; padding:0.25rem 0.6rem; background:var(--bg-tertiary); border-radius:var(--radius-full); border:1px solid var(--border-color); cursor:pointer; width:fit-content;" title="Click to view & edit your name and photo">
+              <img id="headerUserAvatar" src="" alt="User Photo" style="width:22px; height:22px; border-radius:50%; object-fit:cover; border:1px solid var(--accent-emerald);">
+              <span id="headerUserName" style="font-size:0.75rem; font-weight:700; color:var(--text-main);">User</span>
+              <span style="font-size:0.65rem; color:var(--text-muted);">✏️</span>
             </div>
           </div>
         </div>
@@ -571,6 +576,34 @@
         <button type="submit" class="btn btn-primary">Apply Split</button>
       </div>
     </form>
+  <!-- MODAL: EDIT USER PROFILE (NAME & PHOTO) -->
+  <dialog id="profileModal">
+    <div class="modal-header">
+      <h3 class="modal-title">Edit User Profile</h3>
+      <button class="modal-close-btn" onclick="document.getElementById('profileModal').close()">✕</button>
+    </div>
+    <form id="profileForm" onsubmit="app.handleProfileSubmit(event)">
+      <div class="modal-body">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:0.75rem; margin-bottom:1.25rem;">
+          <img id="profileAvatarPreview" src="" alt="Avatar Preview" style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:2.5px solid var(--accent-emerald); box-shadow:var(--shadow-md);">
+          <label for="profilePhotoInput" class="btn btn-outline btn-sm" style="cursor:pointer; display:flex; align-items:center; gap:0.4rem;">
+            📷 Choose Custom Photo
+          </label>
+          <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" onchange="app.previewProfilePhoto(event)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Display Name *</label>
+          <input type="text" id="profileNameInput" class="form-input" placeholder="e.g. Alex" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('profileModal').close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Profile ✨</button>
+      </div>
+    </form>
+  </dialog>
+
   <!-- MODAL: IN-APP CONFIRMATION DIALOG -->
   <dialog id="confirmModal">
     <div class="modal-header">

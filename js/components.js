@@ -182,12 +182,17 @@ class UIComponents {
         statusBadge = `<span class="badge-tag" style="background:rgba(245,158,11,0.15); color:var(--accent-amber);">PENDING</span>`;
       }
 
+      const avatarSrc = req.senderPhoto || store.getDefaultAvatar(req.senderName || 'User');
+
       return `
         <div style="padding:0.9rem; background:var(--bg-tertiary); border:1px solid var(--border-color); border-radius:var(--radius-md); margin-bottom:0.75rem;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.35rem;">
-            <div>
-              <strong style="font-size:0.95rem;">${req.senderName}</strong>
-              <span style="font-size:0.75rem; color:var(--text-muted); margin-left:0.35rem; font-family:var(--font-mono);">(${req.senderCode})</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <img src="${avatarSrc}" alt="${req.senderName}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1.5px solid var(--accent-emerald);">
+              <div>
+                <strong style="font-size:0.95rem; display:block; color:var(--text-main);">${req.senderName}</strong>
+                <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">Code: ${req.senderCode}</span>
+              </div>
             </div>
             <div style="font-family:var(--font-mono); font-weight:800; font-size:1.1rem; color:var(--accent-emerald);">
               ${store.currency}${req.amount.toLocaleString()}

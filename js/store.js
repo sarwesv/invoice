@@ -32,30 +32,69 @@ class Store {
     return code;
   }
 
+  getDefaultAvatar(name = 'User') {
+    const firstChar = (name.trim().charAt(0) || 'U').toUpperCase();
+    const colors = ['#10b981', '#6366f1', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6'];
+    const charCode = firstChar.charCodeAt(0);
+    const color = colors[charCode % colors.length];
+    return `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="${encodeURIComponent(color)}"/><text x="50" y="63" font-size="45" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="bold">${firstChar}</text></svg>`;
+  }
+
   loadUserProfile() {
     try {
       const raw = localStorage.getItem(USER_PROFILE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
         this.userCode = parsed.userCode || this.generateUserCode();
+        this.userName = parsed.userName || '';
+        this.userPhoto = parsed.userPhoto || '';
       } else {
         this.userCode = this.generateUserCode();
+        this.userName = '';
+        this.userPhoto = '';
         this.saveUserProfile();
       }
     } catch (e) {
       this.userCode = this.generateUserCode();
+      this.userName = '';
+      this.userPhoto = '';
     }
-    // The PIN is the same exact thing as the unique User Code (e.g. Fj38f)
     this.userPin = this.userCode;
   }
 
   saveUserProfile() {
     try {
       localStorage.setItem(USER_PROFILE_KEY, JSON.stringify({
-        userCode: this.userCode
+        userCode: this.userCode,
+        userName: this.userName,
+        userPhoto: this.userPhoto
       }));
     } catch (e) {
       console.error('Error saving user profile:', e);
+    }
+  }
+
+  getUserDisplayName() {
+    if (window.currentUser && localStorage.getItem('vaultcraft_hide_account_name') !== 'true') {
+      return window.currentUser.displayName || window.currentUser.email || this.userName || 'Friend';
+    }
+    return this.userName || 'Friend';
+  }
+
+  getUserPhoto() {
+    if (this.userPhoto) return this.userPhoto;
+    if (window.currentUser && window.currentUser.photoURL) {
+      return window.currentUser.photoURL;
+    }
+    return this.getDefaultAvatar(this.getUserDisplayName());
+  }
+
+  updateProfile(name, photo) {
+    if (name !== undefined) this.userName = name.trim();
+    if (photo !== undefined) this.userPhoto = photo;
+    this.saveUserProfile();
+    if (window.app && typeof window.app.updateUserCodeDisplay === 'function') {
+      window.app.updateUserCodeDisplay();
     }
   }
 
@@ -132,12 +171,14 @@ class Store {
   createMoneyRequest(recipientCode, amount, goalId = '', note = '') {
     const timestamp = Date.now();
     const id = 'req_' + timestamp;
+    const senderName = this.getUserDisplayName();
+    const senderPhoto = this.getUserPhoto();
+
     const newRequest = {
       id,
       senderCode: (this.userCode || '').trim(),
-      senderName: (window.currentUser && localStorage.getItem('vaultcraft_hide_account_name') !== 'true') 
-        ? (window.currentUser.displayName || window.currentUser.email) 
-        : 'Friend',
+      senderName,
+      senderPhoto,
       recipientCode: recipientCode.trim(),
       amount: parseFloat(amount) || 0,
       goalId,
